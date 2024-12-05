@@ -11,7 +11,9 @@ class ScoreService (
 
     fun score(number: Long) : Long {
         println(number)
-        crmClient.score(number + 1)
+        if (number < 200) {
+            crmClient.score(number + 1)
+        }
         return number + 1
     }
 }
