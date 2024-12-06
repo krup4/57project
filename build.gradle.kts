@@ -28,3 +28,9 @@ dependencies {
 kotlin {
     jvmToolchain(17)
 }
+
+docker {
+    springBootApplication{
+        baseImage.set("openjdk:17-alpine")
+    }
+}
