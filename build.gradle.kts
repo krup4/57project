@@ -34,3 +34,9 @@ docker {
         baseImage.set("openjdk:17-alpine")
     }
 }
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+}
