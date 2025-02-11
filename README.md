@@ -24,3 +24,9 @@
 
 ## Sequence диаграмма
 ![alt text](https://github.com/krup4/57project/blob/master/sequence_diagram.png)
+
+## C1 диаграмма
+![alt text](https://github.com/krup4/57project/blob/master/c1.png)
+
+## C2 диаграмма
+![alt text](https://github.com/krup4/57project/blob/master/c2.png)
