@@ -20,4 +20,4 @@
   Как бизнес, я хочу представить пользователям сервис для удобной печати файлов, чтобы пользователи не испытывали трудности с печатью файлов, если их принтер не имеет возможность подключения по wifi или bluetooth
 
 ## Sequence диаграмма
-![alt text](https://github.com/krup4/57project/blob/master/sequence_diagram_rafael.jpg)
+![alt text](https://github.com/krup4/57project/blob/master/sequence_diagram.png)
