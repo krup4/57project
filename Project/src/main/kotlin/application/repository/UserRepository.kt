@@ -4,7 +4,7 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name = "files")
+@Table(name = "users")
 class UserRepository (
 
     @Id
