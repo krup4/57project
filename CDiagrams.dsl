@@ -17,10 +17,13 @@ workspace {
         user -> system "Отправка данных для регистрации"
         user -> system "Отправка файла для печати"
         system -> user "Уведомление о завершении печати / ошибке"
+        user -> system "Запрос на получение ранее распечатанных файлов"
+        system -> user "Ранее распечатанные файлы"
+        user -> system "Отправка запрос на печать нераспечатанного файла"
 
         admin -> system "Регистрация администратора"
-        admin -> system "Отправка запрос на печать нераспечатанного файла"
-        system -> admin "Уведомление о завершении печати / ошибке"
+        system -> admin "Данные нового пользователя"
+        admin -> system "Ответ на регистрацию нового пользователя"
 
         user -> system.wa "Отправка данных для регистрации"
         system.wa -> system.main_server "Отправка данных пользователя для регистрации"
@@ -30,25 +33,33 @@ workspace {
         system.wa -> system.main_server "Ответ на запрос регистрации пользователя"
         system.main_server -> system.db "Запись нового пользователя"
 
+        admin -> system.wa "Отправка данных для регистрации"
+        system.wa -> system.main_server "Отправка данных админа"
+        system.main_server -> system.db "Запись нового админа"
+        system.main_server -> system.wa "Ответ на регистрацию админа"
+        system.wa -> admin "Ответ на регистрацию"
+
         user -> system.wa "Отправка файла для печати"
         system.wa -> system.main_server "Отправка файла на сервер печати"
-        system.main_server -> system.server "Отправка файла на сервер печати"
-        system.server -> system.printer "Запрос на печать файла"
-        system.printer -> system.server "Уведомление о завершении печати / ошибке"
-        system.server -> system.main_server "Уведомление о завершении печати / ошибке"
+        system.main_server -> system.printer "Запрос на печать файла"
+        system.main_server -> system.db "Запись нового файла"
+        system.printer -> system.main_server "Уведомление о завершении печати / ошибке"
         system.main_server -> system.wa "Уведомление о завершении печати / ошибке"
         system.wa -> user "Уведомление о завершении печати / ошибке"
-        system.wa -> admin "Уведомление о завершении печати / ошибке"
 
-        admin -> system.wa "Запрос на получение всех нераспечатанных файлов"
+        user -> system.wa "Запрос на получение всех нераспечатанных файлов"
         system.wa -> system.main_server "Запрос на получение всех нераспечатанных файлов"
         system.main_server -> system.db "Запрос на получение всех нераспечатанных файлов"
         system.db -> system.main_server "Все нераспечатанные файлы"
         system.main_server -> system.wa "Все нераспечатанные файлы"
-        system.wa -> admin "Все нераспечатанные файлы"
-        admin -> system.wa "Запрос на печать нераспечатанного файла"
+        system.wa -> user "Все нераспечатанные файлы"
 
-
+        user -> system.wa "Запрос на получение всех ранее распечатанных файлов"
+        system.wa -> system.main_server "Запрос на получение всех ранее распечатанных файлов"
+        system.main_server -> system.db "Запрос на получение всех ранее распечатанных файлов"
+        system.db -> system.main_server "Все ранее распечатанные файлы"
+        system.main_server -> system.wa "Все ранее распечатанные файлы"
+        system.wa -> user "Все ранее распечатанные файлы"
     }
 
     views {
