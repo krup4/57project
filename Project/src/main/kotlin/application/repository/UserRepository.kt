@@ -23,6 +23,9 @@ class UserRepository (
     @Column(nullable = false)
     val isAdmin: Boolean = false,
 
+    @Column(nullable = true)
+    val token: String? = null,
+
     @Column(nullable = false)
-    val token: String
+    val isRegistered: Boolean = false
 )

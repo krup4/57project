@@ -1,6 +1,6 @@
-package application.dto
+package application.request
 
-data class User(
+data class SignUpRequest(
     val login: String,
     val password: String,
     val name: String? = null
