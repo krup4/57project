@@ -23,7 +23,7 @@ class UserController(
     fun getNotRegisteredUsers(@RequestHeader("Authorization") token: String) = userService.getNotRegistered(token)
 
     @PostMapping("/reg_admin")
-    fun regAdmin(@RequestBody request: RegisterAdminRequest) = userService.registerAdmin(request)
+    fun registerAdmin(@RequestBody request: RegisterAdminRequest) = userService.registerAdmin(request)
 
     @PostMapping("/accept_user")
     fun acceptUser(@RequestBody request: AcceptUserRequest, @RequestHeader("Authorization") token: String) = userService.acceptUser(request, token)
