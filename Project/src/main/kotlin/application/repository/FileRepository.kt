@@ -1,23 +1,6 @@
 package application.repository
 
-import jakarta.persistence.*
+import application.entity.File
+import org.springframework.data.jpa.repository.JpaRepository
 
-
-@Entity
-@Table(name = "files")
-class FileRepository (
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
-
-    @ManyToOne // Связь многие-к-одному с таблицей users
-    @JoinColumn(name = "user_id", nullable = false) // Внешний ключ
-    val user: UserRepository, // Ссылка на пользователя
-
-    @Column(nullable = false)
-    val filePath: String,
-
-    @Column(nullable = false)
-    val isPrinted: Boolean = false
-)
+interface FileRepository : JpaRepository<File, Long> {}

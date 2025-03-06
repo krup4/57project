@@ -1,6 +1,6 @@
 package application.service
 
-import application.request.PrintFile
+import application.request.PrintFileRequest
 import application.response.FilesResponse
 import application.response.StatusResponse
 import org.springframework.http.ResponseEntity
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class PrintService {
 
-    fun print(printFIle: PrintFile, token: String): ResponseEntity<StatusResponse> {
+    fun print(printFileRequest: PrintFileRequest, token: String): ResponseEntity<StatusResponse> {
         TODO()
     }
 

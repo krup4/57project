@@ -1,6 +1,6 @@
 package application.request
 
-data class RegAdminRequest(
+data class RegisterAdminRequest(
     val login: String,
     val password: String,
     val name: String? = null,

@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    container_name: postgresql
+    image: postgres:16
+    command: -db-ssl-mode=allow
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data/:/var/lib/postgresql/data
+      - ./postgres-custom-config:/etc/postgresql
+    env_file:
+      - .env
+  api:
+    container_name: api_backend
+    build:
+      context: ./
+      dockerfile: Project/build/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/api_database
+      SPRING_DATASOURCE_USERNAME: default_user
+      SPRING_DATASOURCE_PASSWORD: qwerty123!
+      SPRING_JPA_HIBERNATE_DDL-AUTO: update
+    depends_on:
+      - db

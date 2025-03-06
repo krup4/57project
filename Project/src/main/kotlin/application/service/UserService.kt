@@ -1,7 +1,8 @@
 package application.service
 
 import application.request.AcceptUserRequest
-import application.request.RegAdminRequest
+import application.request.AuthoriseRequest
+import application.request.RegisterAdminRequest
 import application.request.SignUpRequest
 import application.response.AcceptUserResponse
 import application.response.AuthoriseResponse
@@ -11,13 +12,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
-class RegisterService {
+class UserService {
 
-    fun regUser(request: SignUpRequest): ResponseEntity<StatusResponse> {
+    fun registerUser(request: SignUpRequest): ResponseEntity<StatusResponse> {
         TODO()
     }
 
-    fun authUser(login: String, password: String): ResponseEntity<AuthoriseResponse> {
+    fun authUser(request: AuthoriseRequest): ResponseEntity<AuthoriseResponse> {
         TODO()
     }
 
@@ -25,7 +26,7 @@ class RegisterService {
         TODO()
     }
 
-    fun regAdmin(request: RegAdminRequest): ResponseEntity<StatusResponse> {
+    fun registerAdmin(request: RegisterAdminRequest): ResponseEntity<StatusResponse> {
         TODO()
     }
 

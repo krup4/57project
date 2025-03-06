@@ -45,3 +45,6 @@ bin/
 .DS_Store
 
 Second
+
+postgres-custom-config
+postgres_data

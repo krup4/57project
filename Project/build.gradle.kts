@@ -1,9 +1,10 @@
 plugins {
-    kotlin("jvm") version "2.0.10"
+    kotlin("jvm") version "1.9.25"
     id("org.springframework.boot") version "3.3.5"
     kotlin("plugin.spring") version "1.9.23"
     id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
-
+    kotlin("plugin.jpa") version "1.9.25"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "57project"
@@ -17,6 +18,7 @@ dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.6"))
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.4"))
 
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

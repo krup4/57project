@@ -1,17 +1,17 @@
 package application.controller
 
 import application.service.PrintService
-import application.request.PrintFile
+import application.request.PrintFileRequest
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/printer")
+@RequestMapping("/api/v1/printer")
 class PrintController (
     val printService: PrintService
 ) {
 
     @PostMapping("/print")
-    fun printFile(@RequestBody printFile: PrintFile, @RequestHeader("Authorization") token: String) = printService.print(printFile, token)
+    fun printFile(@RequestBody printFileRequest: PrintFileRequest, @RequestHeader("Authorization") token: String) = printService.print(printFileRequest, token)
 
     @GetMapping("/not_printed")
     fun getNotPrinted(@RequestHeader("Authorization") token: String) = printService.getNotPrinted(token)
