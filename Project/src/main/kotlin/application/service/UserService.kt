@@ -2,6 +2,7 @@ package application.service
 
 import application.entity.User
 import application.exception.BadRequestException
+import application.exception.UserIsAlreadyExistsException
 import application.exception.UserNotFoundException
 import application.repository.UserRepository
 import application.request.AcceptUserRequest
@@ -56,7 +57,31 @@ class UserService(
     }
 
     fun registerAdmin(request: RegisterAdminRequest): ResponseEntity<StatusResponse> {
-        TODO()
+        val user = userRepository.findByLogin(request.login)
+
+        if (user != null) {
+            throw UserIsAlreadyExistsException("User is already exists")
+        }
+
+        val secret = System.getenv("SECRET")
+
+        if (request.secret != secret) {
+            throw BadRequestException("Invalid secret")
+        }
+
+        val hashPassword = passwordEncoder.encode(request.password)
+
+        userRepository.save(
+            User(
+                login = request.login,
+                password = hashPassword,
+                name = request.name,
+                isAdmin = true,
+                isRegistered = true
+            )
+        )
+
+        return ResponseEntity.status(200).body(StatusResponse("ok"))
     }
 
     fun acceptUser(request: AcceptUserRequest, token: String): ResponseEntity<AcceptUserResponse> {

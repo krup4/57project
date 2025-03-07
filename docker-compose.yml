@@ -23,5 +23,6 @@ services:
       SPRING_DATASOURCE_USERNAME: default_user
       SPRING_DATASOURCE_PASSWORD: qwerty123!
       SPRING_JPA_HIBERNATE_DDL-AUTO: update
+      SECRET: VIKTORIA_SECRET
     depends_on:
       - db
