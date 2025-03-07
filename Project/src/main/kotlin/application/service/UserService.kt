@@ -84,6 +84,7 @@ class UserService(
         )
 
         return ResponseEntity.status(200).body(StatusResponse("ok"))
+
     }
 
     fun acceptUser(request: AcceptUserRequest, token: String): ResponseEntity<AcceptUserResponse> {
