@@ -12,6 +12,7 @@ import application.response.AcceptUserResponse
 import application.response.AuthoriseResponse
 import application.response.GetNotRegisteredResponse
 import application.response.StatusResponse
+import jakarta.transaction.Transactional
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -27,6 +28,7 @@ class UserService(
         TODO()
     }
 
+    @Transactional
     fun authUser(request: AuthoriseRequest): ResponseEntity<AuthoriseResponse> {
         val user = userRepository.findByLogin(request.login)
 
