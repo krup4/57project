@@ -4,7 +4,12 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name = "files")
+@Table(
+    name = "files",
+    indexes = [
+        Index(name = "idx_user", columnList = "user")
+    ]
+)
 class File (
 
     @Id
@@ -19,5 +24,5 @@ class File (
     val filePath: String,
 
     @Column(nullable = false)
-    val isPrinted: Boolean = false
+    var isPrinted: Boolean = false
 )
