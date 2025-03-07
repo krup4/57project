@@ -5,6 +5,7 @@ import application.service.UserService
 import application.request.AcceptUserRequest
 import application.request.AuthoriseRequest
 import application.request.RegisterAdminRequest
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 
 @RestController

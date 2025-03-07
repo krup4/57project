@@ -15,17 +15,17 @@ class User (
     val login: String,
 
     @Column(nullable = false)
-    val password: String,
+    var password: String,
 
     @Column(nullable = true)
-    val name: String? = null,
+    var name: String? = null,
 
     @Column(nullable = false)
     val isAdmin: Boolean = false,
 
     @Column(nullable = true)
-    val token: String? = null,
+    var token: String? = null,
 
     @Column(nullable = false)
-    val isRegistered: Boolean = false
+    var isRegistered: Boolean = false
 )
