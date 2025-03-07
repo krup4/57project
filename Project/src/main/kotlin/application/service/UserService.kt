@@ -13,6 +13,7 @@ import application.response.AcceptUserResponse
 import application.response.AuthoriseResponse
 import application.response.GetNotRegisteredResponse
 import application.response.StatusResponse
+import jakarta.transaction.Transactional
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -56,6 +57,7 @@ class UserService(
         TODO()
     }
 
+    @Transactional
     fun registerAdmin(request: RegisterAdminRequest): ResponseEntity<StatusResponse> {
         val user = userRepository.findByLogin(request.login)
 
