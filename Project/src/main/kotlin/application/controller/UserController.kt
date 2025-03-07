@@ -6,10 +6,12 @@ import application.request.AcceptUserRequest
 import application.request.AuthoriseRequest
 import application.request.RegisterAdminRequest
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/user")
+@Validated
 class UserController(
     private val userService: UserService
 ) {

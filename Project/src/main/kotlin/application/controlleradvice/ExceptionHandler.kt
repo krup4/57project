@@ -1,6 +1,7 @@
 package application.controlleradvice
 
 import application.exception.BadRequestException
+import application.exception.UserIsAlreadyExistsException
 import application.exception.UserNotFoundException
 import application.response.StatusResponse
 import io.swagger.v3.oas.annotations.Hidden
@@ -24,4 +25,8 @@ class ExceptionHandler {
     @ExceptionHandler(BadRequestException::class)
     fun handleBadRequest(exception: BadRequestException) =
         ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "Bad request"))
+
+    @ExceptionHandler(UserIsAlreadyExistsException::class)
+    fun handleUserIsAlreadyExists(exception: UserIsAlreadyExistsException) =
+        ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "User is already exists"))
 }
