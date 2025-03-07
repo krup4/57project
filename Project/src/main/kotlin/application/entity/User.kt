@@ -34,3 +34,4 @@ class User (
 
     @Column(nullable = false)
     var isRegistered: Boolean = false
+)
