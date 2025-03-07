@@ -15,7 +15,7 @@ services:
     container_name: api_backend
     build:
       context: ./
-      dockerfile: Project/build/docker/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
