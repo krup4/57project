@@ -4,7 +4,12 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name = "files")
+@Table(
+    name = "files",
+    indexes = [
+        Index(name = "idx_user", columnList = "user")
+    ]
+)
 class File (
 
     @Id

@@ -4,7 +4,13 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+    indexes = [
+        Index(name = "idx_user_login", columnList = "login"),
+        Index(name = "idx_jwt_token", columnList = "token")
+    ]
+)
 class User (
 
     @Id
@@ -28,4 +34,3 @@ class User (
 
     @Column(nullable = false)
     var isRegistered: Boolean = false
-)
