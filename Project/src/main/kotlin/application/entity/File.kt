@@ -21,5 +21,5 @@ class File (
     val filePath: String,
 
     @Column(nullable = false)
-    var isPrinted: Boolean = false
+    val isPrinted: Boolean = false
 )
