@@ -30,7 +30,7 @@ class UserService(
     }
 
     @Transactional
-    fun authUser(request: AuthoriseRequest): ResponseEntity<AuthoriseResponse> {
+    fun authUser(request: AuthoriseRequest): AuthoriseResponse {
         val user = userRepository.findByLogin(request.login)
 
         if (user == null) {
@@ -51,7 +51,7 @@ class UserService(
         user.token = token
         userRepository.save(user)
 
-        return ResponseEntity.status(200).body(AuthoriseResponse(token = token))
+        return AuthoriseResponse(token = token)
     }
 
     fun getNotRegistered(token: String): ResponseEntity<GetNotRegisteredResponse> {
@@ -59,7 +59,7 @@ class UserService(
     }
 
     @Transactional
-    fun registerAdmin(request: RegisterAdminRequest): ResponseEntity<StatusResponse> {
+    fun registerAdmin(request: RegisterAdminRequest): StatusResponse {
         val user = userRepository.findByLogin(request.login)
 
         if (user != null) {
@@ -84,7 +84,7 @@ class UserService(
             )
         )
 
-        return ResponseEntity.status(200).body(StatusResponse("ok"))
+        return StatusResponse("ok")
 
     }
 

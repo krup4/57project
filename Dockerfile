@@ -1,8 +1,26 @@
-FROM openjdk:17-alpine
-LABEL maintainer=krupn0ff
+FROM gradle:jdk17 AS cache
+
 WORKDIR /app
-COPY Project/build/docker/libs libs/
-COPY Project/build/docker/resources resources/
-COPY Project/build/docker/classes classes/
-ENTRYPOINT ["java", "-cp", "/app/resources:/app/classes:/app/libs/*", "application.PrinterApplicationKt"]
-EXPOSE 8080
+
+COPY gradle gradle
+COPY ./Project/build.gradle.kts settings.gradle.kts ./
+
+RUN gradle dependencies --no-daemon --stacktrace
+
+FROM gradle:jdk17 AS builder
+
+WORKDIR /app
+
+COPY --from=cache /app/.gradle ./.gradle
+COPY --from=cache /app .
+
+COPY Project/src src
+
+RUN gradle bootJar -x test --no-daemon --stacktrace
+
+FROM openjdk:17-jdk
+
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar ./app.jar
+
+CMD ["java", "-jar", "app.jar"]

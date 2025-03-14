@@ -7,7 +7,7 @@ import jakarta.persistence.*
 @Table(
     name = "files",
     indexes = [
-        Index(name = "idx_user", columnList = "user_id")
+        Index(name = "idx_files_user_id", columnList = "user_id")
     ]
 )
 class File (
