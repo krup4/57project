@@ -7,8 +7,8 @@ import jakarta.persistence.*
 @Table(
     name = "users",
     indexes = [
-        Index(name = "idx_user_login", columnList = "login"),
-        Index(name = "idx_jwt_token", columnList = "token")
+        Index(name = "idx_users_login", columnList = "login"),
+        Index(name = "idx_users_token", columnList = "token")
     ]
 )
 class User (

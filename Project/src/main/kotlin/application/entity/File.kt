@@ -5,10 +5,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(
-    name = "files",
-    indexes = [
-        Index(name = "idx_files_user_id", columnList = "user_id")
-    ]
+    name = "files"
 )
 class File (
 
