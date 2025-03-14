@@ -1,34 +1,26 @@
-# Этап сборки
-FROM openjdk:17-jdk-alpine as build
+FROM gradle:jdk17 AS cache
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем только файлы, необходимые для сборки (оптимизация кэширования Docker)
-COPY settings.gradle.kts .
-COPY Project/build.gradle.kts Project/
-COPY Project/src Project/src
-COPY gradlew .
 COPY gradle gradle
+COPY ./Project/build.gradle.kts settings.gradle.kts ./
 
-# Переходим в папку проекта
-WORKDIR /app/Project
+RUN gradle dependencies --no-daemon --stacktrace
 
-# Собираем проект с помощью Gradle
-RUN chmod +x ../gradlew
-RUN ../gradlew build
+FROM gradle:jdk17 AS builder
 
-# Этап запуска
-FROM openjdk:17-jdk-alpine
-
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем собранный JAR-файл из этапа сборки
-COPY --from=build /app/Project/build/libs/*.jar app.jar
+COPY --from=cache /app/.gradle ./.gradle
+COPY --from=cache /app .
 
-# Открываем порт, на котором будет работать приложение
-EXPOSE 8080
+COPY Project/src src
 
-# Команда для запуска приложения
-ENTRYPOINT ["java", "-jar", "app.jar"]
+RUN gradle bootJar -x test --no-daemon --stacktrace
+
+FROM openjdk:17-jdk
+
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar ./app.jar
+
+CMD ["java", "-jar", "app.jar"]

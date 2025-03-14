@@ -4,7 +4,9 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name = "files")
+@Table(
+    name = "files"
+)
 class File (
 
     @Id
