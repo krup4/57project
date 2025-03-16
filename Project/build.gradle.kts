@@ -5,6 +5,7 @@ plugins {
     id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
     kotlin("plugin.jpa") version "1.9.25"
     id("io.spring.dependency-management") version "1.1.7"
+    jacoco
 }
 
 group = "57project"
@@ -32,6 +33,11 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    val kotestVersion = "5.7.2"
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.mockk:mockk:1.13.16")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("org.hibernate:hibernate-core:6.6.7.Final")
