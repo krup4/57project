@@ -1,6 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 2
+      author: ilya
       changes:
         - createTable:
             tableName: files
