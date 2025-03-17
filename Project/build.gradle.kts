@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.3.5"
     kotlin("plugin.spring") version "1.9.23"
     id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
+    kotlin("plugin.jpa") version "1.9.25"
     id("io.spring.dependency-management") version "1.1.7"
     jacoco
 }
@@ -15,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.6"))
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.4"))
 
