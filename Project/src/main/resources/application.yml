@@ -10,3 +10,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+  spring:
+    liquibase:
+      change-log: classpath:/Changelog/Changelog-master.yml

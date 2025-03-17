@@ -1,5 +1,0 @@
-userDatabaseChangeLog:
-- include:
-    file: resources/Changelog/Changes/v1-create-users-table.yml
-- include:
-    file: resources/Changelog/Changes/v2-create-files-table.yml
