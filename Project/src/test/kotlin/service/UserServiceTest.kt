@@ -2,18 +2,23 @@ package service
 
 import application.entity.User
 import application.exception.BadRequestException
+import application.exception.UserIsAlreadyExistsException
 import application.exception.UserNotFoundException
 import application.repository.UserRepository
 import application.request.AuthoriseRequest
+import application.request.RegisterAdminRequest
 import application.service.JwtService
 import application.service.UserService
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.springframework.security.crypto.password.PasswordEncoder
+import application.response.StatusResponse
+import io.mockk.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.mockito.MockedStatic
+import org.mockito.Mockito.mockStatic
 
 class UserServiceTest {
 
@@ -90,4 +95,86 @@ class UserServiceTest {
         verify(exactly = 1) { jwtService.generateToken(claims = any<Map<String?, Any?>>(), subject = any<String>()) }
         verify(exactly = 1) { userRepository.save(any()) }
     }
+
+    @Test
+    fun `registerAdmin выбрасывает исключение при существующем пользователе`() {
+        val request = RegisterAdminRequest(
+            login = "admin",
+            password = "password",
+            name = "Admin",
+            secret = "secret"
+        )
+
+        every { userRepository.findByLogin(request.login) } returns User(
+            login = "admin",
+            password = "existing",
+            name = "Existing",
+            isAdmin = false,
+            isRegistered = true
+        )
+
+        val exception = assertThrows(UserIsAlreadyExistsException::class.java) {
+            userService.registerAdmin(request)
+        }
+
+        exception.message shouldBe "User is already exists"
+        verify(exactly = 1) { userRepository.findByLogin(request.login) }
+    }
+
+    @Test
+    fun `registerAdmin выбрасывает исключение при неверном секрете`() {
+
+        val mockedSystem: MockedStatic<System> = mockStatic(System::class.java)
+        mockedSystem.`when`<String> { System.getenv("SECRET") }.thenReturn("correct_secret")
+
+        val request = RegisterAdminRequest(
+            login = "admin",
+            password = "password",
+            name = "Admin",
+            secret = "invalid_secret"
+        )
+
+        every { userRepository.findByLogin(request.login) } returns null
+
+        val exception = assertThrows(BadRequestException::class.java) {
+            userService.registerAdmin(request)
+        }
+
+        exception.message shouldBe "Invalid secret"
+
+        verify(exactly = 1) { userRepository.findByLogin(request.login) }
+        verify(exactly = 0) { userRepository.save(any()) }
+        verify(exactly = 0) { passwordEncoder.encode(any()) }
+
+        mockedSystem.close()
+    }
+
+    @Test
+    fun `registerAdmin сохраняет нового администратора при валидных данных`() {
+
+        val mockedSystem: MockedStatic<System> = mockStatic(System::class.java)
+        mockedSystem.`when`<String> { System.getenv("SECRET") }.thenReturn("correct_secret")
+
+        val request = RegisterAdminRequest(
+            login = "admin",
+            password = "password",
+            name = "Admin",
+            secret = "correct_secret"
+        )
+
+        every { userRepository.findByLogin(request.login) } returns null
+        every { passwordEncoder.encode(request.password) } returns "encoded_password"
+        every { userRepository.save(any()) } answers { firstArg() }
+
+        val result = userService.registerAdmin(request)
+
+        result shouldBe StatusResponse("ok")
+        verify(exactly = 1) {
+            userRepository.save(match { user -> user.login == request.login && user.password == "encoded_password" && user.name == request.name && user.isAdmin == true && user.isRegistered == true
+            })
+        }
+
+        mockedSystem.close()
+    }
 }
+

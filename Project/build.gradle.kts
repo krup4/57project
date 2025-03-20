@@ -36,8 +36,10 @@ dependencies {
     val kotestVersion = "5.7.2"
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.mockk:mockk:1.13.16")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("io.mockk:mockk-agent-jvm:1.13.8")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("org.hibernate:hibernate-core:6.6.7.Final")
