@@ -10,22 +10,23 @@ import application.request.RegisterAdminRequest
 import application.service.JwtService
 import application.service.UserService
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.springframework.security.crypto.password.PasswordEncoder
 import application.response.StatusResponse
 import io.mockk.*
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.mockito.MockedStatic
-import org.mockito.Mockito.mockStatic
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.ExtendWith
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension
 
+@ExtendWith(SystemStubsExtension::class)
 class UserServiceTest {
 
     private val userRepository = mockk<UserRepository>()
     private val passwordEncoder = mockk<PasswordEncoder>()
     private val jwtService = mockk<JwtService>()
     private val userService = UserService(userRepository, passwordEncoder, jwtService)
+
 
     @Test
     fun `аунтификация пользователя, пользователя нет в базе`() {
@@ -113,6 +114,7 @@ class UserServiceTest {
             isRegistered = true
         )
 
+
         val exception = assertThrows(UserIsAlreadyExistsException::class.java) {
             userService.registerAdmin(request)
         }
@@ -122,11 +124,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `registerAdmin выбрасывает исключение при неверном секрете`() {
-
-        val mockedSystem: MockedStatic<System> = mockStatic(System::class.java)
-        mockedSystem.`when`<String> { System.getenv("SECRET") }.thenReturn("correct_secret")
-
+    fun `registerAdmin выбрасывает исключение при неверном секрете`(environmentVariables: EnvironmentVariables) {
         val request = RegisterAdminRequest(
             login = "admin",
             password = "password",
@@ -134,6 +132,7 @@ class UserServiceTest {
             secret = "invalid_secret"
         )
 
+        environmentVariables.set("SECRET", "correct_secret")
         every { userRepository.findByLogin(request.login) } returns null
 
         val exception = assertThrows(BadRequestException::class.java) {
@@ -145,16 +144,10 @@ class UserServiceTest {
         verify(exactly = 1) { userRepository.findByLogin(request.login) }
         verify(exactly = 0) { userRepository.save(any()) }
         verify(exactly = 0) { passwordEncoder.encode(any()) }
-
-        mockedSystem.close()
     }
 
     @Test
-    fun `registerAdmin сохраняет нового администратора при валидных данных`() {
-
-        val mockedSystem: MockedStatic<System> = mockStatic(System::class.java)
-        mockedSystem.`when`<String> { System.getenv("SECRET") }.thenReturn("correct_secret")
-
+    fun `registerAdmin сохраняет нового администратора при валидных данных`(environmentVariables: EnvironmentVariables) {
         val request = RegisterAdminRequest(
             login = "admin",
             password = "password",
@@ -162,6 +155,7 @@ class UserServiceTest {
             secret = "correct_secret"
         )
 
+        environmentVariables.set("SECRET", "correct_secret")
         every { userRepository.findByLogin(request.login) } returns null
         every { passwordEncoder.encode(request.password) } returns "encoded_password"
         every { userRepository.save(any()) } answers { firstArg() }
@@ -173,8 +167,5 @@ class UserServiceTest {
             userRepository.save(match { user -> user.login == request.login && user.password == "encoded_password" && user.name == request.name && user.isAdmin == true && user.isRegistered == true
             })
         }
-
-        mockedSystem.close()
     }
 }
-
