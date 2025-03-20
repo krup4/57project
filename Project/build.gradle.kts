@@ -16,7 +16,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.6"))
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.4"))
 
@@ -24,30 +23,30 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-
-    implementation("org.liquibase:liquibase-core")
-
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    val kotestVersion = "5.7.2"
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("io.mockk:mockk-agent-jvm:1.13.8")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("org.hibernate:hibernate-core:6.6.7.Final")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
-    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
-    testImplementation("io.mockk:mockk:1.13.16")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-    // .
+    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.0")
 }
 
 kotlin {
