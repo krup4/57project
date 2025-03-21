@@ -3,7 +3,7 @@ FROM gradle:jdk17 AS cache
 WORKDIR /app
 
 COPY gradle gradle
-COPY ./Project/build.gradle.kts settings.gradle.kts ./
+COPY Project/build.gradle.kts settings.gradle.kts ./
 
 RUN gradle dependencies --no-daemon --stacktrace
 
