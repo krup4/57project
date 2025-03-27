@@ -41,6 +41,10 @@ class UserService(
             throw BadRequestException("Password is incorrect")
         }
 
+        if (!user.isRegistered) {
+            throw BadRequestException("User registration was not confirmed")
+        }
+
         val token = jwtService.generateToken(
             mapOf(
                 "login" to user.login,

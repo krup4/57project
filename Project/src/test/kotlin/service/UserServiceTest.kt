@@ -70,6 +70,32 @@ class UserServiceTest {
     }
 
     @Test
+    fun `аунтификация пользователя, регистрация не подтверждена`() {
+        val request = AuthoriseRequest(
+            login = "killer2000",
+            password = "qwerty123456!"
+        )
+
+        every { passwordEncoder.encode(any()) } answers {
+            firstArg()
+        }
+        every { userRepository.findByLogin(request.login) } returns User(
+            login = "killer2000",
+            password = passwordEncoder.encode("qwerty123456!"),
+            isRegistered = false
+        )
+        every { passwordEncoder.matches(any(), any()) } answers {
+            firstArg<String>() == secondArg<String>()
+        }
+
+        val exception = assertThrows(BadRequestException::class.java) {
+            userService.authUser(request)
+        }
+
+        exception.message shouldBe "User registration was not confirmed"
+    }
+
+    @Test
     fun `аунтификация пользователя, корректная`() {
         val request = AuthoriseRequest(
             login = "killer2000",
@@ -82,6 +108,7 @@ class UserServiceTest {
         every { userRepository.findByLogin(request.login) } returns User(
             login = "killer2000",
             password = passwordEncoder.encode("qwerty123456!"),
+            isRegistered = true
         )
         every { passwordEncoder.matches(any(), any()) } answers {
             firstArg<String>() == secondArg<String>()
