@@ -179,7 +179,7 @@ class UserServiceTest {
             login = "admin",
             password = "password",
             name = "Admin",
-            secret = "correct_secret"
+            secret = "fail"
         )
 
         environmentVariables.set("SECRET", "correct_secret")
