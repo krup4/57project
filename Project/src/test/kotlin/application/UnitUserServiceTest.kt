@@ -1,5 +1,6 @@
-package service
+package application
 
+import application.config.Properties
 import application.entity.User
 import application.exception.BadRequestException
 import application.exception.UserIsAlreadyExistsException
@@ -15,17 +16,15 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import application.response.StatusResponse
 import io.mockk.*
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.extension.ExtendWith
 import uk.org.webcompere.systemstubs.environment.EnvironmentVariables
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension
 
-@ExtendWith(SystemStubsExtension::class)
-class UserServiceTest {
+class UnitUserServiceTest {
 
     private val userRepository = mockk<UserRepository>()
     private val passwordEncoder = mockk<PasswordEncoder>()
     private val jwtService = mockk<JwtService>()
-    private val userService = UserService(userRepository, passwordEncoder, jwtService)
+    private val properties = Properties()
+    private val userService = UserService(userRepository, passwordEncoder, jwtService, properties)
 
 
     @Test
@@ -151,7 +150,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `registerAdmin выбрасывает исключение при неверном секрете`(environmentVariables: EnvironmentVariables) {
+    fun `registerAdmin выбрасывает исключение при неверном секрете`() {
         val request = RegisterAdminRequest(
             login = "admin",
             password = "password",
@@ -159,7 +158,6 @@ class UserServiceTest {
             secret = "invalid_secret"
         )
 
-        environmentVariables.set("SECRET", "correct_secret")
         every { userRepository.findByLogin(request.login) } returns null
 
         val exception = assertThrows(BadRequestException::class.java) {
@@ -174,15 +172,14 @@ class UserServiceTest {
     }
 
     @Test
-    fun `registerAdmin сохраняет нового администратора при валидных данных`(environmentVariables: EnvironmentVariables) {
+    fun `registerAdmin сохраняет нового администратора при валидных данных`() {
         val request = RegisterAdminRequest(
             login = "admin",
             password = "password",
             name = "Admin",
-            secret = "correct_secret"
+            secret = "test"
         )
 
-        environmentVariables.set("SECRET", "correct_secret")
         every { userRepository.findByLogin(request.login) } returns null
         every { passwordEncoder.encode(request.password) } returns "encoded_password"
         every { userRepository.save(any()) } answers { firstArg() }
@@ -191,7 +188,8 @@ class UserServiceTest {
 
         result shouldBe StatusResponse("ok")
         verify(exactly = 1) {
-            userRepository.save(match { user -> user.login == request.login && user.password == "encoded_password" && user.name == request.name && user.isAdmin == true && user.isRegistered == true
+            userRepository.save(match { user ->
+                user.login == request.login && user.password == "encoded_password" && user.name == request.name && user.isAdmin == true && user.isRegistered == true
             })
         }
     }
