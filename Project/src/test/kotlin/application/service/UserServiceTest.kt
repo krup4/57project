@@ -115,3 +115,57 @@ class UserServiceTest {
         }
         exception.message shouldBe "User registration was not confirmed"
     }
+
+    @Test
+    fun `registerAdmin должен корректно сохрянять админа при вводе валидных данных`() {
+        val request = RegisterAdminRequest(
+            login = "admin",
+            password = "password",
+            name = "Admin",
+            secret = properties.secret
+        )
+
+        val result = userService.registerAdmin(request)
+
+        result shouldBe StatusResponse("ok")
+
+        val savedUser = userRepository.findByLogin(request.login)
+        savedUser shouldNotBe null
+        savedUser!!.apply {
+            login shouldBe request.login
+            name shouldBe request.name
+            isAdmin shouldBe true
+            isRegistered shouldBe true
+            passwordEncoder.matches(request.password, password) shouldBe true
+        }
+    }
+
+    @Test
+    fun `registerAdmin должен выбрасывать UserIsAlreadyExistsException, когда пользователь уже существует`() {
+        val request = RegisterAdminRequest(
+            login = testLogin,
+            password = "password",
+            name = "New Admin",
+            secret = properties.secret
+        )
+
+        shouldThrow<UserIsAlreadyExistsException> {
+            userService.registerAdmin(request)
+        }.message shouldBe "User is already exists"
+    }
+
+    @Test
+    fun `registerAdmin должен выбрасывать BadRequestException, когда введен неправильный секрет`() {
+        val request = RegisterAdminRequest(
+            login = "admin",
+            password = "password",
+            name = "Admin",
+            secret = "invalid_secret"
+        )
+
+        shouldThrow<BadRequestException> {
+            userService.registerAdmin(request)
+        }.message shouldBe "Invalid secret"
+    }
+
+}
