@@ -4,10 +4,12 @@ import application.config.Properties
 import application.entity.User
 import application.exception.BadRequestException
 import application.exception.UserNotFoundException
+import application.exception.UserIsAlreadyExistsException
 import application.repository.UserRepository
 import application.request.AuthoriseRequest
 import application.request.RegisterAdminRequest
-import application.request.SignUpRequest
+import application.response.StatusResponse
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.AfterEach
@@ -107,9 +109,9 @@ class UserServiceTest {
         )
         val request = AuthoriseRequest("unregistered@test.com", testPassword)
 
+
         val exception = assertThrows<BadRequestException> {
             userService.authUser(request)
         }
         exception.message shouldBe "User registration was not confirmed"
     }
-}
