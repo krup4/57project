@@ -54,8 +54,9 @@ const AuthPage = () => {
         throw new Error(`${data.message}`);
       }
       console.log('Success:', data);
+      sessionStorage.setItem("token", data.token)
       setSuccess(true);
-      navigate('/auth_user')
+      navigate('/')
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || 'Error submitting form');
