@@ -1,6 +1,7 @@
 package application.controlleradvice
 
 import application.exception.BadRequestException
+import application.exception.UnauthorizedException
 import application.exception.UserIsAlreadyExistsException
 import application.exception.UserNotFoundException
 import application.response.StatusResponse
@@ -29,4 +30,8 @@ class ExceptionHandler {
     @ExceptionHandler(UserIsAlreadyExistsException::class)
     fun handleUserIsAlreadyExists(exception: UserIsAlreadyExistsException) =
         ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "User is already exists"))
+
+    @ExceptionHandler(UnauthorizedException::class)
+    fun handleUnauthorized(exception: UnauthorizedException) =
+        ResponseEntity.status(401).body(StatusResponse(message = exception.message ?: "Unauthorized"))
 }
