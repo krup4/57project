@@ -1,42 +1,29 @@
-import javax.print.PrintServiceLookup
+import javax.print.*
 import javax.print.attribute.HashPrintRequestAttributeSet
 import java.io.FileInputStream
-import javax.print.DocFlavor
-import javax.print.PrintService
-import javax.print.SimpleDoc
 
-fun printTextFile(filePath: String, printerName: String? = null) {
-    val printService = if (printerName != null) {
-        PrintServiceLookup.lookupPrintServices(null, null)
-            .firstOrNull { it.name == printerName }
-    } else {
-        PrintServiceLookup.lookupDefaultPrintService()
-    }
+fun printFile(filePath: String) {
+    val inputStream = FileInputStream(filePath)
+    val flavor = DocFlavor.INPUT_STREAM.AUTOSENSE
+    val doc = SimpleDoc(inputStream, flavor, null)
 
-    if (printService == null) {
-        println("Принтер не найден")
+    val printers = PrintServiceLookup.lookupPrintServices(flavor, null)
+    if (printers.isEmpty()) {
+        println("Нет доступных принтеров!")
         return
     }
 
-    FileInputStream(filePath).use { fis ->
-        val doc = SimpleDoc(fis, DocFlavor.INPUT_STREAM.AUTOSENSE, null)
-        val job = printService.createPrintJob()
-        job.print(doc, HashPrintRequestAttributeSet())
-    }
+    val printer = printers[2] // Берем первый принтер
+    println("Печать на: ${printer.name}")
+
+    printer.createPrintJob().print(doc, null)
+    Thread.sleep(1000) // Даем время на отправку
+
+    inputStream.close()
+    println("Файл должен быть в очереди печати.")
 }
 
-// Использование:
+// Пример использования
 fun main() {
-//    printTextFile("126103650.png") // или без имени для принтера по умолчанию
-    val printers: Array<PrintService> = PrintServiceLookup.lookupPrintServices(null, null)
-
-    if (printers.isEmpty()) {
-        println("Нет доступных принтеров.")
-        return
-    }
-
-    println("Доступные принтеры:")
-    printers.forEachIndexed { index, printer ->
-        println("${index + 1}. ${printer.name}")
-    }
+    printFile("Project/src/test/kotlin/1.png")
 }

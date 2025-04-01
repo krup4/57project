@@ -47,6 +47,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.0")
+
+    implementation("org.apache.pdfbox:pdfbox:3.0.0")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
 }
 
 kotlin {
