@@ -1,9 +1,6 @@
 package application.controlleradvice
 
-import application.exception.BadRequestException
-import application.exception.UnauthorizedException
-import application.exception.UserIsAlreadyExistsException
-import application.exception.UserNotFoundException
+import application.exception.*
 import application.response.StatusResponse
 import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.http.ResponseEntity
@@ -34,4 +31,8 @@ class ExceptionHandler {
     @ExceptionHandler(UnauthorizedException::class)
     fun handleUnauthorized(exception: UnauthorizedException) =
         ResponseEntity.status(401).body(StatusResponse(message = exception.message ?: "Unauthorized"))
+
+    @ExceptionHandler(IncorrectFileException::class)
+    fun handleIncorrectFile(exception: IncorrectFileException) =
+        ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "Incorrect file"))
 }
