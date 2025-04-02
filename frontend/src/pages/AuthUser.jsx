@@ -56,7 +56,7 @@ const AuthPage = () => {
       console.log('Success:', data);
       sessionStorage.setItem("token", data.token)
       setSuccess(true);
-      navigate('/')
+      navigate('/send_file')
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || 'Error submitting form');
