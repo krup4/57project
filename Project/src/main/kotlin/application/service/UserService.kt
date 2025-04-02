@@ -1,5 +1,6 @@
 package application.service
 
+import application.config.Properties
 import application.entity.User
 import application.exception.BadRequestException
 import application.exception.UserIsAlreadyExistsException
@@ -22,7 +23,8 @@ import org.springframework.stereotype.Service
 class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val properties: Properties
 ) {
 
     fun registerUser(request: SignUpRequest): ResponseEntity<StatusResponse> {
@@ -70,9 +72,7 @@ class UserService(
             throw UserIsAlreadyExistsException("User is already exists")
         }
 
-        val secret = System.getenv("SECRET")
-
-        if (request.secret != secret) {
+        if (request.secret != properties.secret) {
             throw BadRequestException("Invalid secret")
         }
 
