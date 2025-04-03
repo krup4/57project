@@ -11,7 +11,7 @@ class PrintController (
 ) {
 
     @PostMapping("/print")
-    fun printFile(@RequestBody printFileRequest: PrintFileRequest, @RequestHeader("Authorization") token: String) = printService.print(printFileRequest, token)
+    fun printFile(printFileRequest: PrintFileRequest, @RequestHeader("Authorization") token: String) = printService.print(printFileRequest, token)
 
     @GetMapping("/not_printed")
     fun getNotPrinted(@RequestHeader("Authorization") token: String) = printService.getNotPrinted(token)

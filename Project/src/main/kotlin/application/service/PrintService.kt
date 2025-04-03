@@ -7,7 +7,6 @@ import application.repository.UserRepository
 import application.request.PrintFileRequest
 import application.response.FilesResponse
 import application.response.StatusResponse
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Paths
