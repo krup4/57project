@@ -1,5 +1,6 @@
 package application.service
 
+import application.entity.File
 import application.exception.IncorrectFileException
 import application.exception.UnauthorizedException
 import application.repository.FileRepository
@@ -7,6 +8,7 @@ import application.repository.UserRepository
 import application.request.PrintFileRequest
 import application.response.FilesResponse
 import application.response.StatusResponse
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -23,6 +25,7 @@ class PrintService (
         Files.createDirectories(saveDir)
     }
 
+    @Transactional
     fun print(printFileRequest: PrintFileRequest, token: String): StatusResponse {
         val user = userRepository.findByToken(token)
 
@@ -37,6 +40,20 @@ class PrintService (
         }
 
         Files.copy(printFileRequest.file.inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
+
+        val file = fileRepository.findByUserAndFilePath(user, filePath.toAbsolutePath().toString())
+
+        if (file != null) {
+            return StatusResponse("ok")
+        }
+
+        fileRepository.save(
+            File(
+                user = user,
+                filePath = filePath.toAbsolutePath().toString(),
+                isPrinted = false
+            )
+        )
 
         return StatusResponse("ok")
     }
