@@ -43,6 +43,7 @@ dependencies {
 
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("org.hibernate:hibernate-core:6.6.7.Final")
+    implementation("org.liquibase:liquibase-core")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
