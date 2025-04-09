@@ -11,6 +11,11 @@ services:
       - ./postgres-custom-config:/etc/postgresql
     env_file:
       - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U default_user -d api_database" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   api:
     container_name: api_backend
     build:
@@ -21,7 +26,8 @@ services:
     environment:
       SECRET: VIKTORIA_SECRET
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   frontend:
     build:
       context: ./
