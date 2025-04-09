@@ -22,10 +22,10 @@ class PrintService (
     private val userRepository: UserRepository,
     private val fileRepository: FileRepository,
 ) {
-    private val saveDir = Paths.get("Project/files").toAbsolutePath().normalize()
+    private val baseDirectory = Paths.get("Project/files").toAbsolutePath().normalize()
 
     init {
-        Files.createDirectories(saveDir)
+        Files.createDirectories(baseDirectory)
     }
 
     @Transactional
@@ -37,8 +37,14 @@ class PrintService (
         }
 
         val fileName = printFileRequest.file.originalFilename ?: "unnamed"
-        val filePath = saveDir.resolve(user.login).resolve(fileName).normalize()
-        if (!filePath.startsWith(saveDir)) {
+        val saveDir = baseDirectory.resolve(user.login)
+
+        if (!Files.exists(saveDir)) {
+            Files.createDirectories(saveDir)
+        }
+
+        val filePath = saveDir.resolve(fileName).normalize()
+        if (!filePath.startsWith(baseDirectory)) {
             throw IncorrectFileException("Incorrect name of the file")
         }
 
@@ -69,11 +75,11 @@ class PrintService (
             File(
                 user = user,
                 filePath = filePath.toAbsolutePath().toString(),
-                isPrinted = false
+                isPrinted = isPrinted
             )
         )
 
-        return StatusResponse("ok")
+        return StatusResponse(if (isPrinted) "ok" else "file was not printed")
     }
 
     fun getNotPrinted(token: String): FilesResponse {
