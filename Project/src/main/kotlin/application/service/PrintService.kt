@@ -9,7 +9,10 @@ import application.request.PrintFileRequest
 import application.response.FilesResponse
 import application.response.StatusResponse
 import jakarta.transaction.Transactional
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.printing.PDFPageable
 import org.springframework.stereotype.Service
+import java.awt.print.PrinterJob
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -34,16 +37,31 @@ class PrintService (
         }
 
         val fileName = printFileRequest.file.originalFilename ?: "unnamed"
-        val filePath = saveDir.resolve(fileName).normalize()
+        val filePath = saveDir.resolve(user.login).resolve(fileName).normalize()
         if (!filePath.startsWith(saveDir)) {
             throw IncorrectFileException("Incorrect name of the file")
         }
 
         Files.copy(printFileRequest.file.inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
 
+        var isPrinted: Boolean
+        try {
+            val document = Loader.loadPDF(java.io.File(fileName))
+            val job = PrinterJob.getPrinterJob()
+            job.setPageable(PDFPageable(document))
+
+            job.print()
+            document.close()
+            isPrinted = true
+        } catch (e: Exception) {
+            isPrinted = false
+        }
+
         val file = fileRepository.findByUserAndFilePath(user, filePath.toAbsolutePath().toString())
 
         if (file != null) {
+            file.isPrinted = isPrinted
+            fileRepository.save(file)
             return StatusResponse("ok")
         }
 
