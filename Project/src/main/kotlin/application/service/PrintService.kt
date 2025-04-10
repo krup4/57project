@@ -1,5 +1,6 @@
 package application.service
 
+import application.client.PrintClient
 import application.entity.File
 import application.exception.IncorrectFileException
 import application.exception.UnauthorizedException
@@ -9,10 +10,8 @@ import application.request.PrintFileRequest
 import application.response.FilesResponse
 import application.response.StatusResponse
 import jakarta.transaction.Transactional
-import org.apache.pdfbox.Loader
-import org.apache.pdfbox.printing.PDFPageable
+import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Service
-import java.awt.print.PrinterJob
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -21,6 +20,7 @@ import java.nio.file.StandardCopyOption
 class PrintService (
     private val userRepository: UserRepository,
     private val fileRepository: FileRepository,
+    private val printClient: PrintClient
 ) {
     private val baseDirectory = Paths.get("Project/files").toAbsolutePath().normalize()
 
@@ -51,15 +51,12 @@ class PrintService (
         Files.copy(printFileRequest.file.inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
 
         var isPrinted: Boolean
-        try {
-            val document = Loader.loadPDF(java.io.File(fileName))
-            val job = PrinterJob.getPrinterJob()
-            job.setPageable(PDFPageable(document))
 
-            job.print()
-            document.close()
+        val printResponse = printClient.printFile(printFileRequest)
+
+        if (printResponse.statusCode == HttpStatusCode.valueOf(200)) {
             isPrinted = true
-        } catch (e: Exception) {
+        } else {
             isPrinted = false
         }
 
@@ -79,7 +76,7 @@ class PrintService (
             )
         )
 
-        return StatusResponse(if (isPrinted) "ok" else "file was not printed")
+        return StatusResponse(printResponse.body.message)
     }
 
     fun getNotPrinted(token: String): FilesResponse {
