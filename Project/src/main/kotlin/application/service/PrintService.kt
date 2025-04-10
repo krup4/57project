@@ -52,7 +52,7 @@ class PrintService (
 
         var isPrinted: Boolean
 
-        val printResponse = printClient.printFile(printFileRequest)
+        val printResponse = printClient.printFile(printFileRequest.file)
 
         if (printResponse.statusCode == HttpStatusCode.valueOf(200)) {
             isPrinted = true
