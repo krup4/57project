@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 
-@FeignClient(name = "printClient", url = "http://localhost:8080/")
+@FeignClient(name = "printClient", url = "http://46.138.45.1:8080/")
 interface PrintClient {
 
     @PostMapping("/print")
