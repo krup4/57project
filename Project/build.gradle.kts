@@ -47,10 +47,14 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.h2database:h2")
     implementation("org.hibernate:hibernate-core:6.6.7.Final")
+    implementation("org.liquibase:liquibase-core")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.0")
     testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.0")
+
+    implementation("org.apache.pdfbox:pdfbox:3.0.0")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
 }
 
 kotlin {
