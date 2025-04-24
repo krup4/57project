@@ -10,6 +10,7 @@ import application.request.PrintFileRequest
 import application.response.FilesResponse
 import application.response.StatusResponse
 import jakarta.transaction.Transactional
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Service
 import java.nio.file.Files
@@ -22,6 +23,7 @@ class PrintService (
     private val fileRepository: FileRepository,
     private val printClient: PrintClient
 ) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
     private val baseDirectory = Paths.get("Project/files").toAbsolutePath().normalize()
 
     init {
@@ -49,14 +51,18 @@ class PrintService (
         }
 
         Files.copy(printFileRequest.file.inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
+        logger.info("Файл сохранен : ${fileName}")
+
 
         var isPrinted: Boolean
 
         val printResponse = printClient.printFile(printFileRequest.file)
 
         if (printResponse.statusCode == HttpStatusCode.valueOf(200)) {
+            logger.info("Файл распечатан")
             isPrinted = true
         } else {
+            logger.warn("Файл не распечатан")
             isPrinted = false
         }
 
@@ -75,7 +81,7 @@ class PrintService (
                 isPrinted = isPrinted
             )
         )
-
+        logger.debug("Сохранен файл user : ${user}, filePath : ${filePath.toAbsolutePath().toString()}, isPrinted : ${isPrinted}")
         return StatusResponse(printResponse.body.message)
     }
 
@@ -87,7 +93,7 @@ class PrintService (
         }
 
         val files = fileRepository.findByUserAndIsPrinted(user, false).map { it.filePath }
-
+        logger.info("Возвращен список нераспечатанных файлов")
         return FilesResponse(files)
     }
 
@@ -99,7 +105,7 @@ class PrintService (
         }
 
         val files = fileRepository.findByUserAndIsPrinted(user, true).map { it.filePath }
-
+        logger.info("Возвращен список распечатанных файлов")
         return FilesResponse(files)
     }
 }
