@@ -35,12 +35,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: token
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: is_registered
+                  name: is_confirmed
                   type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:

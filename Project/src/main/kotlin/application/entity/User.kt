@@ -29,9 +29,6 @@ class User (
     @Column(nullable = false)
     val isAdmin: Boolean = false,
 
-    @Column(nullable = true)
-    var token: String? = null,
-
     @Column(nullable = false)
-    var isRegistered: Boolean = false
+    var isConfirmed: Boolean = false
 )

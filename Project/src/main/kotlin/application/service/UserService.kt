@@ -31,7 +31,6 @@ class UserService(
         TODO()
     }
 
-    @Transactional
     fun authUser(request: AuthoriseRequest): AuthoriseResponse {
         val user = userRepository.findByLogin(request.login)
 
@@ -43,7 +42,7 @@ class UserService(
             throw BadRequestException("Password is incorrect")
         }
 
-        if (!user.isRegistered) {
+        if (!user.isConfirmed) {
             throw BadRequestException("User registration was not confirmed")
         }
 
@@ -54,9 +53,6 @@ class UserService(
             ),
             user.login
         )
-        user.token = token
-        userRepository.save(user)
-
         return AuthoriseResponse(token = token)
     }
 
@@ -84,7 +80,7 @@ class UserService(
                 password = hashPassword,
                 name = request.name,
                 isAdmin = true,
-                isRegistered = true
+                isConfirmed = true
             )
         )
 
