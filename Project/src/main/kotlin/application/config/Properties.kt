@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Configuration
 @ConfigurationProperties("spring.config")
 @RefreshScope
 open class Properties {
-    open val secret: String = "test"
+    open var secret: String = "test"
 }
