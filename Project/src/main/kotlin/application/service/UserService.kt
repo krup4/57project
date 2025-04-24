@@ -35,11 +35,14 @@ class UserService(
 
     @Transactional
     fun authUser(request: AuthoriseRequest): AuthoriseResponse {
+
         val user = userRepository.findByLogin(request.login)
 
         if (user == null) {
             throw UserNotFoundException("User not found")
         }
+
+        logger.debug("Найден пользователь по логину : ${user.login}, id : ${user.id}")
 
         if (!passwordEncoder.matches(request.password, user.password)) {
             throw BadRequestException("Password is incorrect")
@@ -58,7 +61,7 @@ class UserService(
         )
         user.token = token
         userRepository.save(user)
-
+        logger.info("Авторизация пользователя прошла успешно")
         return AuthoriseResponse(token = token)
     }
 
@@ -71,10 +74,12 @@ class UserService(
         val user = userRepository.findByLogin(request.login)
 
         if (user != null) {
+            logger.debug("Логин пользователя : ${user.login}")
             throw UserIsAlreadyExistsException("User is already exists")
         }
 
         if (request.secret != properties.secret) {
+            logger.debug("Секрет : ${request.secret}")
             throw BadRequestException("Invalid secret")
         }
 
@@ -89,7 +94,8 @@ class UserService(
                 isRegistered = true
             )
         )
-
+        logger.debug("Сохранен админ login : ${request.login}, name : ${request.name}, isAdmin : ${true}, isRegistered : ${true}")
+        logger.info("Сохранен админ")
         return StatusResponse("ok")
 
     }
