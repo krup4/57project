@@ -122,6 +122,7 @@ class UserService(
 
     }
 
+    @Transactional
     fun acceptUser(request: AcceptUserRequest, token: String): StatusResponse {
         val user = userRepository.findByToken(token)
 
