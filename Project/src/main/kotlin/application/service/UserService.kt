@@ -15,6 +15,7 @@ import application.response.AuthoriseResponse
 import application.response.GetNotRegisteredResponse
 import application.response.StatusResponse
 import jakarta.transaction.Transactional
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -26,6 +27,7 @@ class UserService(
     private val jwtService: JwtService,
     private val properties: Properties
 ) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun registerUser(request: SignUpRequest): ResponseEntity<StatusResponse> {
         TODO()

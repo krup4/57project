@@ -1,4 +1,7 @@
 spring:
+  output:
+    ansi:
+      enabled: ALWAYS
   application:
     name: printerApplication
   datasource:
@@ -12,5 +15,8 @@ spring:
       ddl-auto: none
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
-config:
-  secret: VIKTORIA_SECRET
+  config:
+    secret: VIKTORIA_SECRET
+
+logging:
+  config: classpath:logback-prod.xml
