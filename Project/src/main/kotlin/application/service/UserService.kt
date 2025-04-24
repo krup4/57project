@@ -2,9 +2,7 @@ package application.service
 
 import application.config.Properties
 import application.entity.User
-import application.exception.BadRequestException
-import application.exception.UserIsAlreadyExistsException
-import application.exception.UserNotFoundException
+import application.exception.*
 import application.repository.UserRepository
 import application.request.AcceptUserRequest
 import application.request.AuthoriseRequest
@@ -29,8 +27,27 @@ class UserService(
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun registerUser(request: SignUpRequest): ResponseEntity<StatusResponse> {
-        TODO()
+    @Transactional
+    fun registerUser(request: SignUpRequest): StatusResponse {
+        val user = userRepository.findByLogin(request.login)
+
+        if (user != null) {
+            throw UserIsAlreadyExistsException("User is already exists")
+        }
+
+        val hashPassword = passwordEncoder.encode(request.password)
+
+        userRepository.save(
+            User(
+                login = request.login,
+                password = hashPassword,
+                name = request.name,
+                isAdmin = false,
+                isRegistered = false
+            )
+        )
+
+        return StatusResponse("ok")
     }
 
     @Transactional
@@ -62,8 +79,19 @@ class UserService(
         return AuthoriseResponse(token = token)
     }
 
-    fun getNotRegistered(token: String): ResponseEntity<GetNotRegisteredResponse> {
-        TODO()
+    fun getNotRegistered(token: String): GetNotRegisteredResponse {
+        val user = userRepository.findByToken(token)
+
+        if (user == null) {
+            throw UserNotFoundException("token is invalid")
+        }
+
+        if (!user.isAdmin) {
+            throw UserIsNotAdminException("User is not admin")
+        }
+
+        val notRegisteredUsers = userRepository.findByIsRegistered(isRegistered = false)
+        return GetNotRegisteredResponse(notRegisteredUsers)
     }
 
     @Transactional
@@ -94,7 +122,32 @@ class UserService(
 
     }
 
-    fun acceptUser(request: AcceptUserRequest, token: String): ResponseEntity<AcceptUserResponse> {
-        TODO()
+    fun acceptUser(request: AcceptUserRequest, token: String): StatusResponse {
+        val user = userRepository.findByToken(token)
+
+        if (user == null) {
+            throw UserNotFoundException("token is invalid")
+        }
+
+        if (user.isAdmin) {
+            throw UserIsAdminException("User is admin")
+        }
+
+        val requestUser = userRepository.findByLogin(request.login)
+
+        if (requestUser == null) {
+            throw UserNotFoundException("User is not found")
+        }
+
+        if (request.isConfirmed) {
+            requestUser.isRegistered = true
+            userRepository.save(requestUser)
+        }
+        else {
+            userRepository.delete(requestUser)
+        }
+
+        return StatusResponse("ok")
+
     }
 }
