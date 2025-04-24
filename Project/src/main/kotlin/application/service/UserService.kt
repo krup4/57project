@@ -130,8 +130,8 @@ class UserService(
             throw UserNotFoundException("token is invalid")
         }
 
-        if (user.isAdmin) {
-            throw UserIsAdminException("User is admin")
+        if (!user.isAdmin) {
+            throw UserIsNotAdminException("User is not admin")
         }
 
         val requestUser = userRepository.findByLogin(request.login)
