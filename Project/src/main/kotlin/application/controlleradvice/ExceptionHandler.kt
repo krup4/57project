@@ -49,4 +49,10 @@ class ExceptionHandler {
         logger.warn("File is incorrect")
         return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "Incorrect file"))
     }
+
+    @ExceptionHandler(UserIsNotAdminException::class)
+    fun handleUserIsNotAdmin(exception: UserIsNotAdminException): ResponseEntity<StatusResponse> {
+        logger.warn("User is not admin")
+        return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "User is not admin"))
+    }
 }
