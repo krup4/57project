@@ -9,9 +9,12 @@ import application.repository.UserRepository
 import application.request.PrintFileRequest
 import application.response.FilesResponse
 import application.response.StatusResponse
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatusCode
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -21,10 +24,12 @@ import java.nio.file.StandardCopyOption
 class PrintService (
     private val userRepository: UserRepository,
     private val fileRepository: FileRepository,
-    private val printClient: PrintClient
+    private val printClient: PrintClient,
+    private val metricRegister: MeterRegistry
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val baseDirectory = Paths.get("Project/files").toAbsolutePath().normalize()
+    private val counter = metricRegister.counter("PrintFileCounter")
 
     init {
         Files.createDirectories(baseDirectory)
@@ -37,6 +42,8 @@ class PrintService (
         if (user == null) {
             throw UnauthorizedException("Authorization error")
         }
+
+        counter.increment()
 
         val fileName = printFileRequest.file.originalFilename ?: "unnamed"
         val saveDir = baseDirectory.resolve(user.login)
@@ -56,7 +63,13 @@ class PrintService (
 
         var isPrinted: Boolean
 
-        val printResponse = printClient.printFile(printFileRequest.file)
+        var printResponse: ResponseEntity<StatusResponse>
+        try {
+            printResponse = printClient.printFile(printFileRequest.file)
+        } catch (e: Exception) {
+            printResponse = ResponseEntity.status(404).body(StatusResponse("error"))
+            logger.warn(e.toString())
+        }
 
         if (printResponse.statusCode == HttpStatusCode.valueOf(200)) {
             logger.info("Файл распечатан")

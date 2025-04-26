@@ -6,7 +6,7 @@ spring:
     name: printerApplicationDev
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://db:5432/api_database # сюда нужно вписать url для вашей базы
+    url: jdbc:postgresql://localhost:5432/api_database # сюда нужно вписать url для вашей базы
     username: default_user
     password: qwerty123!
   jpa:
