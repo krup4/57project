@@ -1,4 +1,4 @@
-FROM gradle:jdk17 AS cache
+FROM gradle:8.13.0-jdk21 AS cache
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY Project/build.gradle.kts settings.gradle.kts ./
 
 RUN gradle dependencies --no-daemon --stacktrace
 
-FROM gradle:jdk17 AS builder
+FROM gradle:8.13.0-jdk21 AS builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ COPY Project/src src
 
 RUN gradle bootJar -x test --no-daemon --stacktrace
 
-FROM openjdk:17-jdk
+FROM openjdk:21-jdk
 
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar ./app.jar

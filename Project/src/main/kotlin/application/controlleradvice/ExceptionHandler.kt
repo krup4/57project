@@ -16,43 +16,49 @@ class ExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleArgumentNotValid(exception: MethodArgumentNotValidException): ResponseEntity<StatusResponse> {
-        logger.warn("Invalid incoming request")
+        logger.warn(exception.message)
         return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "Arguments are not valid"))
     }
 
     @ExceptionHandler(UserNotFoundException::class)
     fun handleUserNotFound(exception: UserNotFoundException): ResponseEntity<StatusResponse> {
-        logger.warn("User not found")
+        logger.warn(exception.message)
         return ResponseEntity.status(404).body(StatusResponse(message = exception.message ?: "User not found"))
     }
 
     @ExceptionHandler(BadRequestException::class)
     fun handleBadRequest(exception: BadRequestException): ResponseEntity<StatusResponse> {
-        logger.warn("Bad request")
+        logger.warn(exception.message)
         return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "Bad request"))
     }
 
     @ExceptionHandler(UserIsAlreadyExistsException::class)
     fun handleUserIsAlreadyExists(exception: UserIsAlreadyExistsException): ResponseEntity<StatusResponse> {
-        logger.warn("User is already exists")
+        logger.warn(exception.message)
         return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "User is already exists"))
     }
 
     @ExceptionHandler(UnauthorizedException::class)
     fun handleUnauthorized(exception: UnauthorizedException): ResponseEntity<StatusResponse> {
-        logger.warn("User is unauthorized")
+        logger.warn(exception.message)
         return ResponseEntity.status(401).body(StatusResponse(message = exception.message ?: "Unauthorized"))
     }
 
     @ExceptionHandler(IncorrectFileException::class)
     fun handleIncorrectFile(exception: IncorrectFileException): ResponseEntity<StatusResponse> {
-        logger.warn("File is incorrect")
+        logger.warn(exception.message)
         return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "Incorrect file"))
     }
 
     @ExceptionHandler(UserIsNotAdminException::class)
     fun handleUserIsNotAdmin(exception: UserIsNotAdminException): ResponseEntity<StatusResponse> {
-        logger.warn("User is not admin")
+        logger.warn(exception.message)
         return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "User is not admin"))
+    }
+
+    @ExceptionHandler(ClientErrorException::class)
+    fun handleClientError(exception: ClientErrorException): ResponseEntity<StatusResponse> {
+        logger.warn(exception.message)
+        return ResponseEntity.status(500).body(StatusResponse(message = exception.message ?: "Client error"))
     }
 }

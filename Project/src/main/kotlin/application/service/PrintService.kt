@@ -2,6 +2,7 @@ package application.service
 
 import application.client.PrintClient
 import application.entity.File
+import application.exception.ClientErrorException
 import application.exception.IncorrectFileException
 import application.exception.UnauthorizedException
 import application.repository.FileRepository
@@ -67,8 +68,7 @@ class PrintService (
         try {
             printResponse = printClient.printFile(printFileRequest.file)
         } catch (e: Exception) {
-            printResponse = ResponseEntity.status(404).body(StatusResponse("error"))
-            logger.warn(e.toString())
+            throw ClientErrorException("Error in client work")
         }
 
         if (printResponse.statusCode == HttpStatusCode.valueOf(200)) {
