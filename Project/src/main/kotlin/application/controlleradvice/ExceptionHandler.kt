@@ -61,4 +61,10 @@ class ExceptionHandler {
         logger.warn(exception.message)
         return ResponseEntity.status(500).body(StatusResponse(message = exception.message ?: "Client error"))
     }
+
+    @ExceptionHandler(RuntimeException::class)
+    fun handleAnotherError(exception: RuntimeException): ResponseEntity<StatusResponse> {
+        logger.error(exception.message)
+        return ResponseEntity.status(500).body(StatusResponse(message = exception.message ?: "Another exception"))
+    }
 }

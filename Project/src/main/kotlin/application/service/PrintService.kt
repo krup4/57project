@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.UUID
 
 @Service
 class PrintService (
@@ -58,8 +59,18 @@ class PrintService (
             throw IncorrectFileException("Incorrect name of the file")
         }
 
+        var curFileId: UUID
+
+        val file = fileRepository.findByUserAndFilePath(user, filePath.toAbsolutePath().toString())
+
+        if (file != null) {
+            curFileId = file.uuid
+        } else {
+            curFileId = UUID.randomUUID()
+        }
+
         Files.copy(printFileRequest.file.inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
-        logger.info("Файл сохранен : ${fileName}")
+        logger.info("Файл сохранен : ${fileName}, id: ${curFileId}")
 
 
         var isPrinted: Boolean
@@ -72,14 +83,12 @@ class PrintService (
         }
 
         if (printResponse.statusCode == HttpStatusCode.valueOf(200)) {
-            logger.info("Файл распечатан")
+            logger.info("Файл ${curFileId} распечатан")
             isPrinted = true
         } else {
-            logger.warn("Файл не распечатан")
+            logger.warn("Файл ${curFileId} не распечатан")
             isPrinted = false
         }
-
-        val file = fileRepository.findByUserAndFilePath(user, filePath.toAbsolutePath().toString())
 
         if (file != null) {
             file.isPrinted = isPrinted
@@ -91,10 +100,11 @@ class PrintService (
             File(
                 user = user,
                 filePath = filePath.toAbsolutePath().toString(),
-                isPrinted = isPrinted
+                isPrinted = isPrinted,
+                uuid = curFileId
             )
         )
-        logger.debug("Сохранен файл user : ${user}, filePath : ${filePath.toAbsolutePath().toString()}, isPrinted : ${isPrinted}")
+        logger.info("Сохранен файл ${curFileId}; user : ${user}, filePath : ${filePath.toAbsolutePath().toString()}, isPrinted : ${isPrinted}")
         return StatusResponse(printResponse.body.message)
     }
 

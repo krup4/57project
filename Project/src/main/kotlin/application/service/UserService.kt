@@ -8,15 +8,14 @@ import application.request.AcceptUserRequest
 import application.request.AuthoriseRequest
 import application.request.RegisterAdminRequest
 import application.request.SignUpRequest
-import application.response.AcceptUserResponse
 import application.response.AuthoriseResponse
 import application.response.GetNotRegisteredResponse
 import application.response.StatusResponse
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
-import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class UserService(
@@ -28,26 +27,30 @@ class UserService(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
-    fun registerUser(request: SignUpRequest): StatusResponse {
+    fun registerUser(request: SignUpRequest): User {
         val user = userRepository.findByLogin(request.login)
 
         if (user != null) {
             throw UserIsAlreadyExistsException("User is already exists")
         }
 
+
         val hashPassword = passwordEncoder.encode(request.password)
 
-        userRepository.save(
+        val newUser = userRepository.save(
             User(
                 login = request.login,
                 password = hashPassword,
                 name = request.name,
                 isAdmin = false,
-                isRegistered = false
+                isConfirmed = false,
+                uuid = UUID.randomUUID()
             )
         )
 
-        return StatusResponse("ok")
+        logger.info("Зарегистрирован пользователь ${newUser.uuid}; login: ${newUser.login}, name: ${newUser.name}, isAdmin: ${newUser.isAdmin}, isConfirmed: ${newUser.isConfirmed}")
+
+        return newUser
     }
 
     @Transactional
@@ -59,13 +62,13 @@ class UserService(
             throw UserNotFoundException("User not found")
         }
 
-        logger.debug("Найден пользователь по логину : ${user.login}, id : ${user.id}")
+        logger.debug("Найден пользователь ${user.uuid} по логину : ${user.login}, id : ${user.id}")
 
         if (!passwordEncoder.matches(request.password, user.password)) {
             throw BadRequestException("Password is incorrect")
         }
 
-        if (!user.isRegistered) {
+        if (!user.isConfirmed) {
             throw BadRequestException("User registration was not confirmed")
         }
 
@@ -78,7 +81,7 @@ class UserService(
         )
         user.token = token
         userRepository.save(user)
-        logger.info("Авторизация пользователя прошла успешно")
+        logger.info("Авторизация пользователя ${user.uuid} прошла успешно")
         return AuthoriseResponse(token = token)
     }
 
@@ -93,16 +96,17 @@ class UserService(
             throw UserIsNotAdminException("User is not admin")
         }
 
-        val notRegisteredUsers = userRepository.findByIsRegistered(isRegistered = false)
+        val notRegisteredUsers = userRepository.findByIsConfirmed(isConfirmed = false)
+        logger.info("Получен список неподтвержденных пользователей")
         return GetNotRegisteredResponse(notRegisteredUsers)
     }
 
     @Transactional
-    fun registerAdmin(request: RegisterAdminRequest): StatusResponse {
+    fun registerAdmin(request: RegisterAdminRequest): User {
         val user = userRepository.findByLogin(request.login)
 
         if (user != null) {
-            logger.debug("Логин пользователя : ${user.login}")
+            logger.debug("Логин пользователя ${user.uuid}: ${user.login}")
             throw UserIsAlreadyExistsException("User is already exists")
         }
 
@@ -113,18 +117,19 @@ class UserService(
 
         val hashPassword = passwordEncoder.encode(request.password)
 
-        userRepository.save(
+        val newAdmin = userRepository.save(
             User(
                 login = request.login,
                 password = hashPassword,
                 name = request.name,
                 isAdmin = true,
-                isRegistered = true
+                isConfirmed = true,
+                uuid = UUID.randomUUID()
             )
         )
-        logger.debug("Сохранен админ login : ${request.login}, name : ${request.name}, isAdmin : ${true}, isRegistered : ${true}")
-        logger.info("Сохранен админ")
-        return StatusResponse("ok")
+        logger.debug("Сохранен админ ${newAdmin.uuid} login : ${request.login}, name : ${request.name}, isAdmin : ${true}, isRegistered : ${true}")
+        logger.info("Сохранен админ ${newAdmin.uuid}")
+        return newAdmin
 
     }
 
@@ -147,11 +152,13 @@ class UserService(
         }
 
         if (request.isConfirmed) {
-            requestUser.isRegistered = true
+            requestUser.isConfirmed = true
             userRepository.save(requestUser)
+            logger.info("Регистрация пользователя ${requestUser.uuid} подтверждена")
         }
         else {
             userRepository.delete(requestUser)
+            logger.info("Регистрация пользователя ${requestUser.uuid} не подтверждена")
         }
 
         return StatusResponse("ok")

@@ -1,6 +1,7 @@
 package application.entity
 
 import jakarta.persistence.*
+import java.util.*
 
 
 @Entity
@@ -18,6 +19,9 @@ class User (
     val id: Long? = null,
 
     @Column(nullable = false)
+    var uuid: UUID,
+
+    @Column(nullable = false)
     val login: String,
 
     @Column(nullable = false)
@@ -33,5 +37,5 @@ class User (
     var token: String? = null,
 
     @Column(nullable = false)
-    var isRegistered: Boolean = false
+    var isConfirmed: Boolean = false
 )

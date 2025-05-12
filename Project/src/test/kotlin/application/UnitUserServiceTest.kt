@@ -14,9 +14,13 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.springframework.security.crypto.password.PasswordEncoder
 import application.response.StatusResponse
+import io.kotest.assertions.asClue
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.*
+import org.apache.commons.collections4.functors.TruePredicate
 import org.junit.jupiter.api.*
 import uk.org.webcompere.systemstubs.environment.EnvironmentVariables
+import java.util.*
 
 class UnitUserServiceTest {
 
@@ -56,6 +60,7 @@ class UnitUserServiceTest {
         every { userRepository.findByLogin(request.login) } returns User(
             login = "killer2000",
             password = passwordEncoder.encode("pupupu!2121"),
+            uuid = UUID.randomUUID()
         )
         every { passwordEncoder.matches(any(), any()) } answers {
             firstArg<String>() == secondArg<String>()
@@ -81,7 +86,8 @@ class UnitUserServiceTest {
         every { userRepository.findByLogin(request.login) } returns User(
             login = "killer2000",
             password = passwordEncoder.encode("qwerty123456!"),
-            isRegistered = false
+            isConfirmed = false,
+            uuid = UUID.randomUUID()
         )
         every { passwordEncoder.matches(any(), any()) } answers {
             firstArg<String>() == secondArg<String>()
@@ -107,7 +113,8 @@ class UnitUserServiceTest {
         every { userRepository.findByLogin(request.login) } returns User(
             login = "killer2000",
             password = passwordEncoder.encode("qwerty123456!"),
-            isRegistered = true
+            isConfirmed = true,
+            uuid = UUID.randomUUID()
         )
         every { passwordEncoder.matches(any(), any()) } answers {
             firstArg<String>() == secondArg<String>()
@@ -137,7 +144,8 @@ class UnitUserServiceTest {
             password = "existing",
             name = "Existing",
             isAdmin = false,
-            isRegistered = true
+            isConfirmed = true,
+            uuid = UUID.randomUUID()
         )
 
 
@@ -186,10 +194,16 @@ class UnitUserServiceTest {
 
         val result = userService.registerAdmin(request)
 
-        result shouldBe StatusResponse("ok")
+        result.shouldBeInstanceOf<User>()
+        result.asClue { user: User ->
+            user.login shouldBe request.login
+            user.name shouldBe request.name
+            user.isAdmin shouldBe true
+            user.isConfirmed shouldBe true
+        }
         verify(exactly = 1) {
             userRepository.save(match { user ->
-                user.login == request.login && user.password == "encoded_password" && user.name == request.name && user.isAdmin == true && user.isRegistered == true
+                user.login == request.login && user.password == "encoded_password" && user.name == request.name && user.isAdmin == true && user.isConfirmed == true
             })
         }
     }

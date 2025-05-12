@@ -9,9 +9,11 @@ import application.repository.UserRepository
 import application.request.AuthoriseRequest
 import application.request.RegisterAdminRequest
 import application.response.StatusResponse
+import io.kotest.assertions.asClue
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.junit.jupiter.api.assertThrows
+import java.util.*
 
 @SpringBootTest(
     properties = [
@@ -56,7 +59,8 @@ class UserServiceTest {
                 login = testLogin,
                 password = passwordEncoder.encode(testPassword),
                 name = testName,
-                isRegistered = true
+                isConfirmed = true,
+                uuid = UUID.randomUUID()
             )
         )
     }
@@ -104,7 +108,8 @@ class UserServiceTest {
             User(
                 login = "unregistered@test.com",
                 password = passwordEncoder.encode(testPassword),
-                isRegistered = false
+                isConfirmed = false,
+                uuid = UUID.randomUUID()
             )
         )
         val request = AuthoriseRequest("unregistered@test.com", testPassword)
@@ -127,7 +132,13 @@ class UserServiceTest {
 
         val result = userService.registerAdmin(request)
 
-        result shouldBe StatusResponse("ok")
+        result.shouldBeInstanceOf<User>()
+        result.asClue { user: User ->
+            user.login shouldBe request.login
+            user.name shouldBe request.name
+            user.isAdmin shouldBe true
+            user.isConfirmed shouldBe true
+        }
 
         val savedUser = userRepository.findByLogin(request.login)
         savedUser shouldNotBe null
@@ -135,7 +146,7 @@ class UserServiceTest {
             login shouldBe request.login
             name shouldBe request.name
             isAdmin shouldBe true
-            isRegistered shouldBe true
+            isConfirmed shouldBe true
             passwordEncoder.matches(request.password, password) shouldBe true
         }
     }

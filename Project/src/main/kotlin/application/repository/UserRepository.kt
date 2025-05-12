@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface UserRepository : JpaRepository<User, Long> {
     fun findByLogin(login: String): User?
 
-    fun findByIsRegistered(isRegistered: Boolean): List<User>
+    fun findByIsConfirmed(isConfirmed: Boolean): List<User>
 
     fun findByToken(token: String): User?
 
