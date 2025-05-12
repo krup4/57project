@@ -6,4 +6,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh
+        include: refresh, health, metrics, prometheus
+
+  metrics:
+    export:
+      prometheus:
+        enabled: true

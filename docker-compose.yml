@@ -16,6 +16,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   api:
     container_name: api_backend
     build:
@@ -26,12 +27,30 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
   frontend:
     build:
       context: ./
       dockerfile: frontend/Dockerfile
     ports:
-      - "3000:3000"
+      - "3001:3001"
     restart: always
     depends_on:
       - api
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:

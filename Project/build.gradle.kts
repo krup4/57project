@@ -55,10 +55,13 @@ dependencies {
 
     implementation("org.apache.pdfbox:pdfbox:3.0.0")
     implementation("org.apache.poi:poi-ooxml:5.2.3")
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 docker {

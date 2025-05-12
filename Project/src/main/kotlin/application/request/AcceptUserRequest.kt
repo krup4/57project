@@ -1,5 +1,6 @@
 package application.request
 
 data class AcceptUserRequest (
-    val userId : Long
+    val login : String,
+    var isConfirmed: Boolean
 )
