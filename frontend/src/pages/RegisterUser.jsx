@@ -17,7 +17,6 @@ const RegisterAdmin = () => {
   const [formData, setFormData] = useState({
     login: '',
     password: '',
-    secret: '',
     name: null
   });
   const [loading, setLoading] = useState(false);
@@ -39,7 +38,7 @@ const RegisterAdmin = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/user/reg_admin', {
+      const response = await fetch('http://localhost:8080/api/v1/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +67,7 @@ const RegisterAdmin = () => {
     <Container maxWidth="sm">
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
-          Регистрация администратора
+          Регистрация пользователя
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
@@ -102,15 +101,6 @@ const RegisterAdmin = () => {
             onChange={handleChange}
             fullWidth
             required
-            margin="normal"
-          />
-
-          <TextField
-            label="Secret"
-            name="secret"
-            value={formData.secret}
-            onChange={handleChange}
-            fullWidth
             margin="normal"
           />
 

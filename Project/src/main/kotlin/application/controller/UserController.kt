@@ -16,7 +16,7 @@ class UserController(
 ) {
 
     @PostMapping("/register")
-    fun registerUser(@RequestBody request: SignUpRequest): StatusResponse {
+    fun registerUser(@Valid @RequestBody request: SignUpRequest): StatusResponse {
         val user = userService.registerUser(request)
         return StatusResponse("ok")
     }
@@ -34,5 +34,5 @@ class UserController(
     }
 
     @PostMapping("/accept_user")
-    fun acceptUser(@RequestBody request: AcceptUserRequest, @RequestHeader("Authorization") token: String) = userService.acceptUser(request, token)
+    fun acceptUser(@Valid @RequestBody request: AcceptUserRequest, @RequestHeader("Authorization") token: String) = userService.acceptUser(request, token)
 }

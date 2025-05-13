@@ -17,7 +17,10 @@ class ExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleArgumentNotValid(exception: MethodArgumentNotValidException): ResponseEntity<StatusResponse> {
         logger.warn(exception.message)
-        return ResponseEntity.badRequest().body(StatusResponse(message = exception.message ?: "Arguments are not valid"))
+        val errors = exception.bindingResult.fieldErrors.associate { error ->
+            error.field to (error.defaultMessage ?: "Invalid value")
+        }
+        return ResponseEntity.badRequest().body(StatusResponse(errors.toString()))
     }
 
     @ExceptionHandler(UserNotFoundException::class)

@@ -56,7 +56,7 @@ const AuthPage = () => {
       console.log('Success:', data);
       sessionStorage.setItem("token", data.token)
       setSuccess(true);
-      navigate('/send_file')
+      navigate('/accept_users')
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || 'Error submitting form');
@@ -69,7 +69,7 @@ const AuthPage = () => {
     <Container maxWidth="sm">
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
-          Authentication Form
+          Вход
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>

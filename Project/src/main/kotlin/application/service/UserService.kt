@@ -105,6 +105,8 @@ class UserService(
     fun registerAdmin(request: RegisterAdminRequest): User {
         val user = userRepository.findByLogin(request.login)
 
+        logger.debug(request.toString())
+
         if (user != null) {
             logger.debug("Логин пользователя ${user.uuid}: ${user.login}")
             throw UserIsAlreadyExistsException("User is already exists")
