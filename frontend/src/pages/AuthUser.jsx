@@ -84,7 +84,7 @@ const AuthPage = () => {
 
   return (
     <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ p: 4, mt: 4, position: 'relative', backgroundColor: '#121212',color: '#ffffff' }}>
+      <Paper elevation={3} sx={{ p: 4, mt: 4, position: 'relative', backgroundColor: '#121212', color: '#ffffff' }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Вход
         </Typography>
@@ -123,6 +123,22 @@ const AuthPage = () => {
             fullWidth
             required
             margin="normal"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#ffffff', // Белый цвет текста
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff', // Белый цвет лейбла
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы
+                },
+                '&:hover fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы при наведении
+                },
+              },
+            }}
           />
 
           <TextField
@@ -134,6 +150,22 @@ const AuthPage = () => {
             fullWidth
             required
             margin="normal"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#ffffff', // Белый цвет текста
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff', // Белый цвет лейбла
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы
+                },
+                '&:hover fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы при наведении
+                },
+              },
+            }}
           />
 
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>

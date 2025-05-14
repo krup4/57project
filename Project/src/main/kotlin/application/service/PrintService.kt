@@ -5,6 +5,7 @@ import application.entity.File
 import application.exception.ClientErrorException
 import application.exception.IncorrectFileException
 import application.exception.UnauthorizedException
+import application.exception.UserNotFoundException
 import application.repository.FileRepository
 import application.repository.UserRepository
 import application.request.PrintFileRequest
@@ -27,7 +28,8 @@ class PrintService (
     private val userRepository: UserRepository,
     private val fileRepository: FileRepository,
     private val printClient: PrintClient,
-    private val metricRegister: MeterRegistry
+    private val metricRegister: MeterRegistry,
+    private val jwtService: JwtService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val baseDirectory = Paths.get("Project/files").toAbsolutePath().normalize()
@@ -39,7 +41,13 @@ class PrintService (
 
     @Transactional
     fun print(printFileRequest: PrintFileRequest, token: String): StatusResponse {
-        val user = userRepository.findByToken(token)
+        if (!jwtService.validateToken(token)) {
+            throw UserNotFoundException("token is invalid")
+        }
+
+        val login = jwtService.getLoginFromToken(token)
+        val user = userRepository.findByLogin(login)
+
 
         if (user == null) {
             throw UnauthorizedException("Authorization error")
@@ -109,7 +117,13 @@ class PrintService (
     }
 
     fun getNotPrinted(token: String): FilesResponse {
-        val user = userRepository.findByToken(token)
+        if (!jwtService.validateToken(token)) {
+            throw UserNotFoundException("token is invalid")
+        }
+
+        val login = jwtService.getLoginFromToken(token)
+        val user = userRepository.findByLogin(login)
+
 
         if (user == null) {
             throw UnauthorizedException("Authorization error")
@@ -121,7 +135,13 @@ class PrintService (
     }
 
     fun getPrinted(token: String): FilesResponse {
-        val user = userRepository.findByToken(token)
+        if (!jwtService.validateToken(token)) {
+            throw UserNotFoundException("token is invalid")
+        }
+
+        val login = jwtService.getLoginFromToken(token)
+        val user = userRepository.findByLogin(login)
+
 
         if (user == null) {
             throw UnauthorizedException("Authorization error")

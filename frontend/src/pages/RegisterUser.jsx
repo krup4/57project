@@ -111,6 +111,22 @@ const RegisterAdmin = () => {
             fullWidth
             required
             margin="normal"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#ffffff', // Белый цвет текста
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff', // Белый цвет лейбла
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы
+                },
+                '&:hover fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы при наведении
+                },
+              },
+            }}
           />
 
           <TextField
@@ -122,6 +138,22 @@ const RegisterAdmin = () => {
             fullWidth
             required
             margin="normal"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#ffffff', // Белый цвет текста
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff', // Белый цвет лейбла
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы
+                },
+                '&:hover fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы при наведении
+                },
+              },
+            }}
           />
 
           <TextField
@@ -131,6 +163,22 @@ const RegisterAdmin = () => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#ffffff', // Белый цвет текста
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff', // Белый цвет лейбла
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы
+                },
+                '&:hover fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы при наведении
+                },
+              },
+            }}
           />
 
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>

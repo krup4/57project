@@ -6,7 +6,9 @@ import {
   Typography,
   Box,
   Paper,
-  IconButton
+  IconButton,
+  Divider,
+  Grid
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 
@@ -31,6 +33,14 @@ const HomePage = () => {
 
   const handleAcceptUsers = () => {
     navigate('/accept_users');
+  };
+
+  const handlePrintedFiles = () => {
+    navigate('/printed_files');
+  };
+
+  const handleNotPrintedFiles = () => {
+    navigate('/not_printed_files');
   };
 
   const handleLogout = () => {
@@ -66,6 +76,42 @@ const HomePage = () => {
           justifyContent: 'center',
           mt: 4
         }}>
+          {/* Новые кнопки для фильтрации файлов */}
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                color="success"
+                fullWidth
+                size="large"
+                onClick={handlePrintedFiles}
+                sx={{
+                  py: 2,
+                  fontSize: '1rem'
+                }}
+              >
+                Напечатанные файлы
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                color="warning"
+                fullWidth
+                size="large"
+                onClick={handleNotPrintedFiles}
+                sx={{
+                  py: 2,
+                  fontSize: '1rem'
+                }}
+              >
+                Ненапечатанные файлы
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 2 }} />
+
           <Button
             variant="contained"
             size="large"

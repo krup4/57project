@@ -5,6 +5,7 @@ databaseChangeLog:
       changes:
         - createTable:
             tableName: files
+            schemaName: public
             columns:
               - column:
                   name: id

@@ -5,6 +5,7 @@ databaseChangeLog:
       changes:
         - createTable:
             tableName: users
+            schemaName: public
             columns:
               - column:
                   name: id
@@ -40,11 +41,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: token
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: true
-              - column:
                   name: is_confirmed
                   type: BOOLEAN
                   defaultValueBoolean: false
@@ -58,12 +54,6 @@ databaseChangeLog:
               - column:
                   name: login
 
-        - createIndex:
-            tableName: users
-            indexName: idx_users_token
-            columns:
-              - column:
-                  name: token
       rollback:
         - dropTable:
             tableName: users
