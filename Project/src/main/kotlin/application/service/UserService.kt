@@ -79,17 +79,20 @@ class UserService(
             ),
             user.login
         )
-        user.token = token
-        userRepository.save(user)
         logger.info("Авторизация пользователя ${user.uuid} прошла успешно")
-        return AuthoriseResponse(token = token)
+        return AuthoriseResponse(token = token, isAdmin = user.isAdmin)
     }
 
     fun getNotRegistered(token: String): GetNotRegisteredResponse {
-        val user = userRepository.findByToken(token)
+        if (!jwtService.validateToken(token)) {
+            throw UserNotFoundException("token is invalid")
+        }
+
+        val login = jwtService.getLoginFromToken(token)
+        val user = userRepository.findByLogin(login)
 
         if (user == null) {
-            throw UserNotFoundException("token is invalid")
+            throw UnauthorizedException("Authorization error")
         }
 
         if (!user.isAdmin) {
@@ -137,10 +140,15 @@ class UserService(
 
     @Transactional
     fun acceptUser(request: AcceptUserRequest, token: String): StatusResponse {
-        val user = userRepository.findByToken(token)
+        if (!jwtService.validateToken(token)) {
+            throw UserNotFoundException("token is invalid")
+        }
+
+        val login = jwtService.getLoginFromToken(token)
+        val user = userRepository.findByLogin(login)
 
         if (user == null) {
-            throw UserNotFoundException("token is invalid")
+            throw UnauthorizedException("Authorization error")
         }
 
         if (!user.isAdmin) {

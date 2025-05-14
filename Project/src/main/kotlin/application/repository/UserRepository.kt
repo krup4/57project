@@ -8,7 +8,4 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findByLogin(login: String): User?
 
     fun findByIsConfirmed(isConfirmed: Boolean): List<User>
-
-    fun findByToken(token: String): User?
-
 }
