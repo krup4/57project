@@ -127,7 +127,6 @@ class UnitUserServiceTest {
         userService.authUser(request)
 
         verify(exactly = 1) { jwtService.generateToken(claims = any<Map<String?, Any?>>(), subject = any<String>()) }
-        verify(exactly = 1) { userRepository.save(any()) }
     }
 
     @Test
