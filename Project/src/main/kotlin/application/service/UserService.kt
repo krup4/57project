@@ -82,7 +82,7 @@ class UserService(
         user.token = token
         userRepository.save(user)
         logger.info("Авторизация пользователя ${user.uuid} прошла успешно")
-        return AuthoriseResponse(token = token)
+        return AuthoriseResponse(token = token, isAdmin = user.isAdmin)
     }
 
     fun getNotRegistered(token: String): GetNotRegisteredResponse {

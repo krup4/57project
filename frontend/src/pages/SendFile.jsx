@@ -8,8 +8,9 @@ import {
   Paper,
   IconButton
 } from '@mui/material';
-import { CloudUpload, Delete } from '@mui/icons-material';
+import { CloudUpload, Delete, ArrowBack } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -24,6 +25,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const SendFile = () => {
+  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -59,7 +61,6 @@ const SendFile = () => {
       const response = await fetch('http://localhost:8080/api/v1/printer/print', {
         method: 'POST',
         body: formData,
-        // Если ваш бэкенд требует авторизацию:
         headers: {
           'Authorization': `${sessionStorage.getItem("token")}`
         },
@@ -86,42 +87,89 @@ const SendFile = () => {
     }
   };
 
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" component="h1" gutterBottom>
+      <Paper elevation={3} sx={{ p: 4, position: 'relative', backgroundColor: '#121212', color: '#ffffff' }}>
+        <IconButton
+          onClick={handleGoHome}
+          sx={{
+            position: 'absolute',
+            left: 16,
+            top: 16,
+            color: '#d4d4d4'
+          }}
+          title="На главную"
+        >
+          <ArrowBack />
+        </IconButton>
+
+        <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ pt: 1, mb: 4 }}>
           Загрузка файла
         </Typography>
-        
-        <Box sx={{ mb: 3 }}>
+
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '200px',
+          mb: 4
+        }}>
           {!selectedFile ? (
             <Button
               component="label"
               variant="contained"
-              startIcon={<CloudUpload />}
+              startIcon={<CloudUpload sx={{ fontSize: '2rem' }} />}
+              sx={{
+                fontSize: '1.5rem',
+                padding: '16px 32px',
+                minHeight: '80px',
+                borderRadius: '8px'
+              }}
             >
               Выберите файл
-              <VisuallyHiddenInput 
-                type="file" 
-                onChange={handleFileChange} 
+              <VisuallyHiddenInput
+                type="file"
+                onChange={handleFileChange}
               />
             </Button>
           ) : (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="body1">
-                Выбран файл: {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 3,
+              width: '100%'
+            }}>
+              <Typography variant="h6" sx={{ fontSize: '1.25rem' }}>
+                Выбран файл: {selectedFile.name}
               </Typography>
-              <IconButton onClick={handleRemoveFile} color="error">
-                <Delete />
+              <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                Размер: {Math.round(selectedFile.size / 1024)} KB
+              </Typography>
+              <IconButton
+                onClick={handleRemoveFile}
+                color="error"
+                sx={{ fontSize: '2rem' }}
+              >
+                <Delete fontSize="inherit" />
               </IconButton>
             </Box>
           )}
         </Box>
 
         {isUploading && (
-          <Box sx={{ width: '100%', mb: 2 }}>
-            <LinearProgress variant="determinate" value={uploadProgress} />
-            <Typography variant="body2" sx={{ mt: 1 }}>
+          <Box sx={{ width: '100%', mb: 3 }}>
+            <LinearProgress
+              variant="determinate"
+              value={uploadProgress}
+              sx={{ height: '10px', borderRadius: '5px' }}
+            />
+            <Typography variant="h6" sx={{ mt: 2, textAlign: 'center' }}>
               {uploadProgress}% загружено
             </Typography>
           </Box>
@@ -134,20 +182,39 @@ const SendFile = () => {
             onClick={handleUpload}
             disabled={isUploading}
             fullWidth
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 3,
+              fontSize: '1.25rem',
+              padding: '12px 24px',
+              minHeight: '45px'
+            }}
           >
             Загрузить файл
           </Button>
         )}
 
         {uploadError && (
-          <Typography color="error" sx={{ mt: 2 }}>
+          <Typography
+            color="error"
+            sx={{
+              mt: 2,
+              fontSize: '1.1rem',
+              textAlign: 'center'
+            }}
+          >
             {uploadError}
           </Typography>
         )}
 
         {uploadSuccess && (
-          <Typography color="success.main" sx={{ mt: 2 }}>
+          <Typography
+            color="success.main"
+            sx={{
+              mt: 2,
+              fontSize: '1.1rem',
+              textAlign: 'center'
+            }}
+          >
             Файл успешно загружен!
           </Typography>
         )}
