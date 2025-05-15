@@ -26,7 +26,7 @@ const PrintedFiles = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('http://localhost:8080/api/v1/printer/printed', {
+      const response = await fetch('http://45.43.89.85:8080/api/v1/printer/printed', {
         headers: {
           'Authorization': `${sessionStorage.getItem("token")}`
         }
