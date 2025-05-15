@@ -58,7 +58,7 @@ const SendFile = () => {
     setUploadError(null);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/printer/print', {
+      const response = await fetch('http://45.43.89.85:8080/api/v1/printer/print', {
         method: 'POST',
         body: formData,
         headers: {
