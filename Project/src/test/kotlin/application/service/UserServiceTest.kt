@@ -5,12 +5,18 @@ import application.entity.User
 import application.exception.BadRequestException
 import application.exception.UserNotFoundException
 import application.exception.UserIsAlreadyExistsException
+import application.exception.UserIsNotAdminException
 import application.repository.UserRepository
+import application.request.AcceptUserRequest
 import application.request.AuthoriseRequest
 import application.request.RegisterAdminRequest
+import application.request.SignUpRequest
 import application.response.StatusResponse
 import io.kotest.assertions.asClue
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -49,6 +55,9 @@ class UserServiceTest {
     private val testLogin = "test@example.com"
     private val testPassword = "securePassword1488"
     private val testName = "Ryan Gosling"
+    private lateinit var adminUser: User
+    private lateinit var regularUser: User
+    private lateinit var unconfirmedUser: User
 
     @BeforeEach
     fun setup() {
@@ -61,6 +70,40 @@ class UserServiceTest {
                 name = testName,
                 isConfirmed = true,
                 uuid = UUID.randomUUID()
+            )
+        )
+
+        adminUser = userRepository.save(
+            User(
+                login = "admin@test.com",
+                password = "admin_pass",
+                uuid = UUID.randomUUID(),
+                name = "Admin",
+                isAdmin = true,
+                isConfirmed = true,
+                token = "admin_token"
+            )
+        )
+
+        regularUser = userRepository.save(
+            User(
+                login = "user@test.com",
+                password = "user_pass",
+                uuid = UUID.randomUUID(),
+                name = "Regular User",
+                isAdmin = false,
+                isConfirmed = true,
+                token = "user_token"
+            )
+        )
+
+
+        unconfirmedUser = userRepository.save(
+            User(
+                login = "unconfirmed@test.com",
+                password = "password",
+                uuid = UUID.randomUUID(),
+                isConfirmed = false
             )
         )
     }
@@ -179,4 +222,184 @@ class UserServiceTest {
         }.message shouldBe "Invalid secret"
     }
 
+
+    @Test
+    fun `registrUser должен корректо сохранять нового пользователя ` () {
+        val request = SignUpRequest(
+            login = "user",
+            password = "password",
+            name = "User"
+        )
+
+        val result = userService.registerUser(request)
+
+        result.shouldBeInstanceOf<User>()
+        result.asClue { user: User ->
+            user.login shouldBe request.login
+            user.name shouldBe request.name
+            user.isAdmin shouldBe false
+            user.isConfirmed shouldBe false
+        }
+
+        val savedUser = userRepository.findByLogin(request.login)
+
+        savedUser shouldNotBe null
+        savedUser!!.apply {
+            login shouldBe request.login
+            name shouldBe request.name
+            passwordEncoder.matches(request.password, password) shouldBe true
+            isAdmin shouldBe false
+            isConfirmed shouldBe false
+            passwordEncoder.matches(request.password, password) shouldBe true
+        }
+    }
+
+
+    @Test
+    fun `registrUser должен выбрасывать User is already exists, если пользователь уже существует` () {
+        val request = RegisterAdminRequest(
+            login = testLogin,
+            password = "password",
+            name = "New User",
+            secret = properties.secret
+        )
+
+        shouldThrow<UserIsAlreadyExistsException> {
+            userService.registerAdmin(request)
+        }.message shouldBe "User is already exists"
+    }
+
+
+    /*
+    @Test
+    fun `getNotRegistered должен возвращать только неподтвержденных пользователей`() {
+        // Создаем неподтвержденных пользователей
+        val unconfirmedUsers = listOf(
+            User(
+                login = "unconfirmed1@test.com",
+                password = "pass1",
+                uuid = UUID.randomUUID(),
+                isConfirmed = false
+            ),
+            User(
+                login = "unconfirmed2@test.com",
+                password = "pass2",
+                uuid = UUID.randomUUID(),
+                isConfirmed = false
+            )
+        ).map { userRepository.save(it) }
+
+        val response = userService.getNotRegistered(adminUser.token!!)
+
+        response.users shouldHaveSize  2
+        response.users.map { it.login } shouldContainAll unconfirmedUsers.map { it.login }
+    }
+    */
+
+    @Test
+    fun `getNotRegistered должен выбрасывать исключение при невалидном токене`() {
+        shouldThrow<UserNotFoundException> {
+            userService.getNotRegistered("invalid_token_123")
+        }.message shouldBe "token is invalid"
+    }
+
+
+    @Test
+    fun `getNotRegistered должен проверять права администратора`() {
+        shouldThrow<UserIsNotAdminException> {
+            userService.getNotRegistered(regularUser.token!!)
+        }.message shouldBe "User is not admin"
+    }
+
+    /*
+    @Test
+    fun `getNotRegistered должен игнорировать пользователей с null токеном`() {
+        userRepository.save(
+            User(
+                login = "no_token@test.com",
+                password = "pass",
+                uuid = UUID.randomUUID(),
+                isConfirmed = false,
+                token = null
+            )
+        )
+
+        val response = userService.getNotRegistered(adminUser.token!!)
+        response.users shouldHaveSize 1
+    }
+     */
+
+    @Test
+    fun `acceptUser должен подтверждать пользователя при isConfirmed = true`() {
+        val request = AcceptUserRequest(
+            login = unconfirmedUser.login,
+            isConfirmed = true
+        )
+
+        val response = userService.acceptUser(request, adminUser.token!!)
+
+        response shouldBe StatusResponse("ok")
+
+        val updatedUser = userRepository.findByLogin(unconfirmedUser.login)
+        updatedUser!!.isConfirmed shouldBe true
+    }
+
+
+    @Test
+    fun `acceptUser должен удалять пользователя при isConfirmed = false`() {
+        val request = AcceptUserRequest(
+            login = unconfirmedUser.login,
+            isConfirmed = false
+        )
+
+        val response = userService.acceptUser(request, adminUser.token!!)
+
+        response shouldBe StatusResponse("ok")
+
+        userRepository.findByLogin(unconfirmedUser.login) shouldBe null
+    }
+
+
+    @Test
+    fun `acceptUser должен выбрасывать исключение при невалидном токене админа`() {
+        val request = AcceptUserRequest(unconfirmedUser.login, true)
+
+        shouldThrow<UserNotFoundException> {
+            userService.acceptUser(request, "invalid_token")
+        }.message shouldBe "token is invalid"
+    }
+
+
+    @Test
+    fun `acceptUser должен проверять права администратора`() {
+        val request = AcceptUserRequest(unconfirmedUser.login, true)
+
+        shouldThrow<UserIsNotAdminException> {
+            userService.acceptUser(request, regularUser.token!!)
+        }.message shouldBe "User is not admin"
+    }
+
+
+    @Test
+    fun `acceptUser должен выбрасывать исключение если пользователь не найден`() {
+        val request = AcceptUserRequest("non_existing@test.com", true)
+
+        shouldThrow<UserNotFoundException> {
+            userService.acceptUser(request, adminUser.token!!)
+        }.message shouldBe "User is not found"
+    }
+
+
+    @Test
+    fun `acceptUser должен корректно обрабатывать уже подтвержденного пользователя`() {
+        unconfirmedUser.isConfirmed = true
+        userRepository.save(unconfirmedUser)
+
+        val request = AcceptUserRequest(unconfirmedUser.login, true)
+
+        val response = userService.acceptUser(request, adminUser.token!!)
+
+        userRepository.findByLogin(unconfirmedUser.login)!!.isConfirmed shouldBe true
+        response shouldBe StatusResponse("ok")
+    }
 }
