@@ -37,6 +37,31 @@
 ## C2 диаграмма
 ![alt text](https://github.com/krup4/57project/blob/master/c2.png)
 
+## Схема сущностей БД
+```mermaid
+erDiagram
+
+    USER ||--O{ TASK : "несколько файлов"
+
+    USER {
+        int id PK
+        uuid uuid
+        string login
+        string password
+        string name
+        bool is_admin
+        bool is_confirmed
+    }
+
+    TASK {
+        int id PK
+        int user_id FK
+        uuid uuid
+        string file_path
+        bool is_printed
+    }
+```
+
 ## DDL
 ```sql
 CREATE TABLE users
