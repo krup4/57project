@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
 
-@FeignClient(name = "printClient", url = "http://localhost:50/")
+@FeignClient(name = "printClient", url = "http://45.43.89.85:63112/")
 interface PrintClient {
 
     @PostMapping(path= ["/print"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
