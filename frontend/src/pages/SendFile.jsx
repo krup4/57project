@@ -77,8 +77,13 @@ const SendFile = () => {
       }
 
       const result = await response.json();
-      console.log('Успешная загрузка:', result);
-      setUploadSuccess(true);
+      console.log('Успешная печать:', result.message);
+      if (result.message === "Файл напечатан") {
+        setUploadSuccess(true);
+      } else {
+        setUploadSuccess(false);
+        setUploadError(result.message || "Ошибка печати")
+      }
     } catch (error) {
       console.error('Ошибка при загрузке файла:', error);
       setUploadError(error.message || 'Произошла ошибка при загрузке файла');
@@ -215,7 +220,7 @@ const SendFile = () => {
               textAlign: 'center'
             }}
           >
-            Файл успешно загружен!
+            Файл успешно напечатан!
           </Typography>
         )}
       </Paper>

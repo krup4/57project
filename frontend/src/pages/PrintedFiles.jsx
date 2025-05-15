@@ -12,8 +12,7 @@ import {
   Box,
   IconButton
 } from '@mui/material';
-import { Refresh } from '@mui/icons-material';
-import { ArrowBack } from '@mui/icons-material';
+import { Refresh, ArrowBack } from '@mui/icons-material';
 
 const PrintedFiles = () => {
   const navigate = useNavigate();
@@ -37,7 +36,14 @@ const PrintedFiles = () => {
       }
 
       const data = await response.json();
-      setFiles(data);
+      console.log("Received data:", data); // Для отладки
+
+      if (data && data.files && Array.isArray(data.files)) {
+        setFiles(data.files);
+      } else {
+        setFiles([]);
+        console.warn("Unexpected data structure:", data);
+      }
     } catch (err) {
       setError(err.message);
       console.error("Error fetching files:", err);
@@ -56,6 +62,10 @@ const PrintedFiles = () => {
 
   const handleGoHome = () => {
     navigate('/');
+  };
+
+  const getFileName = (path) => {
+    return path.split('/').pop();
   };
 
   return (
@@ -96,22 +106,24 @@ const PrintedFiles = () => {
           </Alert>
         )}
 
-        {!loading && !error && files.length === 0 && (
-          <Typography variant="body1" color="text.secondary">
-            Файлы не найдены
-          </Typography>
-        )}
-
-        {!loading && !error && files.length > 0 && (
-          <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-            {files.map((file) => (
-              <ListItem key={file.id} divider>
-                <ListItemText
-                  primary={file.filePath}
-                />
-              </ListItem>
-            ))}
-          </List>
+        {!loading && !error && (
+          <>
+            {files.length === 0 ? (
+              <Typography variant="body1" color="text.secondary">
+                Файлы не найдены
+              </Typography>
+            ) : (
+              <List sx={{ width: '100%', backgroundColor: '#121212', color: '#ffffff' }}>
+                {files.map((filePath, index) => (
+                  <ListItem key={index} divider>
+                    <ListItemText
+                      primary={getFileName(filePath)}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </>
         )}
       </Paper>
     </Container>
