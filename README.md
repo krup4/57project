@@ -41,7 +41,7 @@
 ```mermaid
 erDiagram
 
-    USER ||--O{ TASK : "несколько файлов"
+    USER ||--O{ FILE : "несколько файлов"
 
     USER {
         int id PK
@@ -53,7 +53,7 @@ erDiagram
         bool is_confirmed
     }
 
-    TASK {
+    FILE {
         int id PK
         int user_id FK
         uuid uuid
