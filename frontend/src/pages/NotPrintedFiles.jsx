@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   List,
@@ -12,8 +13,10 @@ import {
   IconButton
 } from '@mui/material';
 import { Refresh } from '@mui/icons-material';
+import { ArrowBack } from '@mui/icons-material';
 
 const NotPrintedFiles = () => {
+  const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +25,7 @@ const NotPrintedFiles = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch('http://localhost:8080/api/v1/printer/not_printed', {
         headers: {
           'Authorization': `${sessionStorage.getItem("token")}`
@@ -51,15 +54,29 @@ const NotPrintedFiles = () => {
     fetchFiles();
   };
 
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 4, mt: 4, backgroundColor: '#121212', color: '#ffffff' }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h4" component="h1">
+        <Box display="flex" alignItems="center" mb={3}>
+          <IconButton
+            onClick={handleGoHome}
+            sx={{
+              color: '#d4d4d4',
+              mr: 2
+            }}
+            title="На главную"
+          >
+            <ArrowBack />
+          </IconButton>
+          <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
             Список нераспечатанных файлов
           </Typography>
-          <IconButton 
-            onClick={handleRefresh} 
+          <IconButton
+            onClick={handleRefresh}
             color="primary"
             disabled={loading}
           >
