@@ -7,9 +7,13 @@ import {
   Container,
   Paper,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Divider,
+  IconButton
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { ArrowBack } from '@mui/icons-material';
+
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -18,7 +22,7 @@ const AuthPage = () => {
     login: '',
     password: '',
     secret: '',
-    name: ''
+    name: null
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -55,8 +59,9 @@ const AuthPage = () => {
       }
       console.log('Success:', data);
       sessionStorage.setItem("token", data.token)
+      sessionStorage.setItem("isAdmin", data.isAdmin)
       setSuccess(true);
-      navigate('/accept_users')
+      navigate('/')
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || 'Error submitting form');
@@ -65,12 +70,37 @@ const AuthPage = () => {
     }
   };
 
+  const navigateToUserRegister = () => {
+    navigate('/register_user');
+  };
+
+  const navigateToAdminRegister = () => {
+    navigate('/register_admin');
+  };
+
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   return (
     <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, mt: 4, position: 'relative', backgroundColor: '#121212', color: '#ffffff' }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Вход
         </Typography>
+
+        <IconButton
+          onClick={handleGoHome}
+          sx={{
+            position: 'absolute',
+            left: 16,
+            top: 16,
+            color: '#d4d4d4'
+          }}
+          title="На главную"
+        >
+          <ArrowBack />
+        </IconButton>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
           {error && (
@@ -81,7 +111,7 @@ const AuthPage = () => {
 
           {success && (
             <Alert severity="success" sx={{ mb: 2 }}>
-              Form submitted successfully!
+              Успешный вход!
             </Alert>
           )}
 
@@ -93,6 +123,22 @@ const AuthPage = () => {
             fullWidth
             required
             margin="normal"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#ffffff', // Белый цвет текста
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff', // Белый цвет лейбла
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы
+                },
+                '&:hover fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы при наведении
+                },
+              },
+            }}
           />
 
           <TextField
@@ -104,6 +150,22 @@ const AuthPage = () => {
             fullWidth
             required
             margin="normal"
+            sx={{
+              '& .MuiInputBase-input': {
+                color: '#ffffff', // Белый цвет текста
+              },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff', // Белый цвет лейбла
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы
+                },
+                '&:hover fieldset': {
+                  borderColor: '#ffffff', // Белый цвет границы при наведении
+                },
+              },
+            }}
           />
 
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
@@ -113,15 +175,40 @@ const AuthPage = () => {
               color="primary"
               size="large"
               disabled={loading}
+              sx={{ width: '100%' }}
             >
               {loading ? (
                 <>
                   <CircularProgress size={24} color="inherit" />
-                  <Box component="span" sx={{ ml: 1 }}>Submitting...</Box>
+                  <Box component="span" sx={{ ml: 1 }}>Вход...</Box>
                 </>
               ) : (
-                'Submit'
+                'Войти'
               )}
+            </Button>
+          </Box>
+
+          <Divider sx={{ my: 3 }}>Или</Divider>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="large"
+              onClick={navigateToUserRegister}
+              sx={{ width: '100%' }}
+            >
+              Регистрация пользователя
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="large"
+              onClick={navigateToAdminRegister}
+              sx={{ width: '100%' }}
+            >
+              Регистрация администратора
             </Button>
           </Box>
         </Box>

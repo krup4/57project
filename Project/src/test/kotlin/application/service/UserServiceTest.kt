@@ -120,9 +120,6 @@ class UserServiceTest {
 
         response.token shouldNotBe null
         response.token.isBlank() shouldBe false
-
-        val user = userRepository.findByLogin(testLogin)
-        user?.token shouldBe response.token
     }
 
     @Test

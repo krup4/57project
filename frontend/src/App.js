@@ -5,6 +5,8 @@ import MainPage from './pages/MainPage'
 import SendFile from './pages/SendFile';
 import RegisterUser from './pages/RegisterUser';
 import AcceptUsers from './pages/AcceptUsers';
+import NotPrintedFiles from './pages/NotPrintedFiles';
+import PrintedFiles from './pages/PrintedFiles';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/send_file" element={<SendFile />} />
         <Route path="/register_user" element={<RegisterUser />} />
         <Route path="/accept_users" element={<AcceptUsers />} />
+        <Route path="/not_printed_files" element={<NotPrintedFiles />} />
+        <Route path="/printed_files" element={<PrintedFiles />} />
       </Routes>
     </Router>
   );

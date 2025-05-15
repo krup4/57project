@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -10,10 +11,14 @@ import {
   ListItemText,
   Divider,
   Alert,
-  CircularProgress
+  CircularProgress,
+  IconButton
 } from '@mui/material';
+import { ArrowBack } from '@mui/icons-material';
+
 
 const AcceptUsers = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +32,8 @@ const AcceptUsers = () => {
         }
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        navigate('/')
+        throw new Error("Недостаточно прав")
       }
       const data = await response.json();
       setUsers(data.users || []);
@@ -63,8 +69,6 @@ const AcceptUsers = () => {
       }
 
       setSuccess(`User ${login} has been ${isConfirmed ? 'approved' : 'rejected'}`);
-      
-      // Перезагружаем список пользователей после успешного действия
       await fetchUsers();
     } catch (error) {
       setError(error.message);
@@ -73,65 +77,83 @@ const AcceptUsers = () => {
     }
   };
 
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   return (
     <Container maxWidth="md">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center">
-          Users Management
-        </Typography>
+      <Paper elevation={3} sx={{
+        p: 4, mt: 4, position: "relative", backgroundColor: '#121212',color: '#ffffff'}}>
+        < Typography variant="h4" component="h1" gutterBottom align="center">
+        Подтверждение регистрации пользователей
+      </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+      <IconButton
+        onClick={handleGoHome}
+        sx={{
+          position: 'absolute',
+          left: 16,
+          top: 16,
+          color: '#d4d4d4'
+        }}
+        title="На главную"
+      >
+        <ArrowBack />
+      </IconButton>
 
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
-          </Alert>
-        )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <List>
-            {users.map((user) => (
-              <React.Fragment key={user.login}>
-                <ListItem>
-                  <ListItemText
-                    primary={user.login}
-                    secondary={user.name || 'No name provided'}
-                    sx={{ flexGrow: 1 }}
-                  />
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      disabled={loading}
-                      onClick={() => handleUserAction(user.login, true)}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      disabled={loading}
-                      onClick={() => handleUserAction(user.login, false)}
-                    >
-                      Reject
-                    </Button>
-                  </Box>
-                </ListItem>
-                <Divider component="li" />
-              </React.Fragment>
-            ))}
-          </List>
-        )}
-      </Paper>
-    </Container>
+      {success && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {success}
+        </Alert>
+      )}
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <List>
+          {users.map((user) => (
+            <React.Fragment key={user.login}>
+              <ListItem>
+                <ListItemText
+                  primary={user.login}
+                  secondary={user.name || 'No name provided'}
+                  sx={{ flexGrow: 1 }}
+                />
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    disabled={loading}
+                    onClick={() => handleUserAction(user.login, true)}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    disabled={loading}
+                    onClick={() => handleUserAction(user.login, false)}
+                  >
+                    Reject
+                  </Button>
+                </Box>
+              </ListItem>
+              <Divider component="li" />
+            </React.Fragment>
+          ))}
+        </List>
+      )}
+    </Paper>
+    </Container >
   );
 };
 

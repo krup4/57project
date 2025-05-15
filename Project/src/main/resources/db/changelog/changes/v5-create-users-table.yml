@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: 2
+      id: 1
       author: ilya
       changes:
         - createTable:
-            tableName: files
+            tableName: users
             schemaName: public
             columns:
               - column:
@@ -20,30 +20,40 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: user_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: file_path
+                  name: login
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
               - column:
-                  name: is_printed
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_admin
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_confirmed
                   type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
 
-        - addForeignKeyConstraint:
-            baseTableName: files
-            baseColumnNames: user_id
-            constraintName: fk_files_user_id
-            referencedTableName: users
-            referencedColumnNames: id
-            onDelete: CASCADE
+        - createIndex:
+            tableName: users
+            indexName: idx_users_login
+            columns:
+              - column:
+                  name: login
 
       rollback:
         - dropTable:
-            tableName: files
+            tableName: users
