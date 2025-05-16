@@ -28,12 +28,10 @@ class PrintService (
     private val userRepository: UserRepository,
     private val fileRepository: FileRepository,
     private val printClient: PrintClient,
-    private val metricRegister: MeterRegistry,
     private val jwtService: JwtService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val baseDirectory = Paths.get("Project/files").toAbsolutePath().normalize()
-    private val counter = metricRegister.counter("PrintFileCounter")
 
     init {
         Files.createDirectories(baseDirectory)
@@ -52,8 +50,6 @@ class PrintService (
         if (user == null) {
             throw UnauthorizedException("Authorization error")
         }
-
-        counter.increment()
 
         val fileName = printFileRequest.file.originalFilename ?: "unnamed"
         val saveDir = baseDirectory.resolve(user.login)
