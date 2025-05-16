@@ -82,7 +82,7 @@ const PrintedFiles = () => {
           >
             <ArrowBack />
           </IconButton>
-          <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
+          <Typography variant="h4" component="h1" sx={{ flexGrow: 1, color: '#ffffff' }}>
             Список распечатанных файлов
           </Typography>
           <IconButton
@@ -101,7 +101,7 @@ const PrintedFiles = () => {
         )}
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert severity="error" sx={{ mb: 3, color: '#ffffff' }}>
             Ошибка при загрузке файлов: {error}
           </Alert>
         )}
@@ -109,7 +109,7 @@ const PrintedFiles = () => {
         {!loading && !error && (
           <>
             {files.length === 0 ? (
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" color="#ffffff">
                 Файлы не найдены
               </Typography>
             ) : (
