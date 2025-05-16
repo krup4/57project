@@ -41,7 +41,7 @@ const RegisterAdmin = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/user/register', {
+      const response = await fetch('http://45.43.89.85:8080/api/v1/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

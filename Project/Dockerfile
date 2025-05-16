@@ -1,26 +1,9 @@
-FROM gradle:8.13.0-jdk21 AS cache
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
-COPY gradle gradle
-COPY Project/build.gradle.kts settings.gradle.kts ./
+COPY Project/Project-1.0-SNAPSHOT.jar app.jar
 
-RUN gradle dependencies --no-daemon --stacktrace
+EXPOSE 8080
 
-FROM gradle:8.13.0-jdk21 AS builder
-
-WORKDIR /app
-
-COPY --from=cache /app/.gradle ./.gradle
-COPY --from=cache /app .
-
-COPY Project/src src
-
-RUN gradle bootJar -x test --no-daemon --stacktrace
-
-FROM openjdk:21-jdk
-
-WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar ./app.jar
-
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

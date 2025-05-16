@@ -43,7 +43,7 @@ const AuthPage = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/user/authorize', {
+      const response = await fetch('http://45.43.89.85:8080/api/v1/user/authorize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

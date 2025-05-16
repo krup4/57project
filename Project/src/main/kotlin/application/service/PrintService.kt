@@ -83,18 +83,17 @@ class PrintService (
 
         var isPrinted: Boolean
 
-        var printResponse: ResponseEntity<StatusResponse>
+        var printResponse: ResponseEntity<StatusResponse>? = null
         try {
             printResponse = printClient.printFile(printFileRequest.file)
+            logger.info("Файл ${curFileId} распечатан")
         } catch (e: Exception) {
-            throw ClientErrorException("Error in client work")
+            logger.warn("Файл ${curFileId} не распечатан")
         }
 
-        if (printResponse.statusCode == HttpStatusCode.valueOf(200)) {
-            logger.info("Файл ${curFileId} распечатан")
+        if (printResponse != null && printResponse.statusCode == HttpStatusCode.valueOf(200)) {
             isPrinted = true
         } else {
-            logger.warn("Файл ${curFileId} не распечатан")
             isPrinted = false
         }
 
@@ -113,7 +112,7 @@ class PrintService (
             )
         )
         logger.info("Сохранен файл ${curFileId}; user : ${user}, filePath : ${filePath.toAbsolutePath().toString()}, isPrinted : ${isPrinted}")
-        return StatusResponse(printResponse.body.message)
+        return StatusResponse(if (isPrinted) "Файл напечатан" else "Ошибка печати")
     }
 
     fun getNotPrinted(token: String): FilesResponse {

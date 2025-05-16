@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   List,
@@ -11,9 +12,10 @@ import {
   Box,
   IconButton
 } from '@mui/material';
-import { Refresh } from '@mui/icons-material';
+import { Refresh, ArrowBack } from '@mui/icons-material';
 
-const NotPrintedFiles = () => {
+const PrintedFiles = () => {
+  const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,8 +24,8 @@ const NotPrintedFiles = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch('http://localhost:8080/api/v1/printer/not_printed', {
+
+      const response = await fetch('http://45.43.89.85:8080/api/v1/printer/not_printed', {
         headers: {
           'Authorization': `${sessionStorage.getItem("token")}`
         }
@@ -34,7 +36,15 @@ const NotPrintedFiles = () => {
       }
 
       const data = await response.json();
-      setFiles(data);
+      console.log("Received data:", data); // Для отладки
+
+      // Обрабатываем структуру {"files": [...]}
+      if (data && data.files && Array.isArray(data.files)) {
+        setFiles(data.files);
+      } else {
+        setFiles([]);
+        console.warn("Unexpected data structure:", data);
+      }
     } catch (err) {
       setError(err.message);
       console.error("Error fetching files:", err);
@@ -51,15 +61,34 @@ const NotPrintedFiles = () => {
     fetchFiles();
   };
 
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
+  // Функция для извлечения имени файла из пути
+  const getFileName = (path) => {
+    return path.split('/').pop();
+  };
+
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 4, mt: 4, backgroundColor: '#121212', color: '#ffffff' }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h4" component="h1">
+        <Box display="flex" alignItems="center" mb={3}>
+          <IconButton
+            onClick={handleGoHome}
+            sx={{
+              color: '#d4d4d4',
+              mr: 2
+            }}
+            title="На главную"
+          >
+            <ArrowBack />
+          </IconButton>
+          <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
             Список нераспечатанных файлов
           </Typography>
-          <IconButton 
-            onClick={handleRefresh} 
+          <IconButton
+            onClick={handleRefresh}
             color="primary"
             disabled={loading}
           >
@@ -79,26 +108,28 @@ const NotPrintedFiles = () => {
           </Alert>
         )}
 
-        {!loading && !error && files.length === 0 && (
-          <Typography variant="body1" color="text.secondary">
-            Файлы не найдены
-          </Typography>
-        )}
-
-        {!loading && !error && files.length > 0 && (
-          <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-            {files.map((file) => (
-              <ListItem key={file.id} divider>
-                <ListItemText
-                  primary={file.filePath}
-                />
-              </ListItem>
-            ))}
-          </List>
+        {!loading && !error && (
+          <>
+            {files.length === 0 ? (
+              <Typography variant="body1" color="text.secondary">
+                Файлы не найдены
+              </Typography>
+            ) : (
+              <List sx={{ width: '100%', backgroundColor: '#121212', color: '#ffffff' }}>
+                {files.map((filePath, index) => (
+                  <ListItem key={index} divider>
+                    <ListItemText
+                      primary={getFileName(filePath)}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </>
         )}
       </Paper>
     </Container>
   );
 };
 
-export default NotPrintedFiles;
+export default PrintedFiles;

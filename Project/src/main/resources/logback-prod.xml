@@ -18,6 +18,6 @@
     <root level="INFO">
         <appender-ref ref="prod"/>
     </root>
-    <logger name="application" level="DEBUG" />
+    <logger name="application" level="INFO" />
 
 </configuration>
