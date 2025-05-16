@@ -59,6 +59,9 @@ class UserServiceTest {
     private lateinit var regularUser: User
     private lateinit var unconfirmedUser: User
 
+    private lateinit var adminToken: String
+    private lateinit var regularUserToken: String
+
     @BeforeEach
     fun setup() {
         userService = UserService(userRepository, passwordEncoder, jwtService, properties)
@@ -80,10 +83,19 @@ class UserServiceTest {
                 uuid = UUID.randomUUID(),
                 name = "Admin",
                 isAdmin = true,
-                isConfirmed = true,
-                token = "admin_token"
+                isConfirmed = true
             )
         )
+
+        adminToken = jwtService.generateToken(
+            mapOf(
+                "login" to adminUser.login,
+                "name" to adminUser.name,
+                "isAdmin" to true
+            ),
+            adminUser.login
+        )
+
 
         regularUser = userRepository.save(
             User(
@@ -92,11 +104,17 @@ class UserServiceTest {
                 uuid = UUID.randomUUID(),
                 name = "Regular User",
                 isAdmin = false,
-                isConfirmed = true,
-                token = "user_token"
+                isConfirmed = true
             )
         )
-
+        regularUserToken = jwtService.generateToken(
+            mapOf(
+                "login" to regularUser.login,
+                "name" to regularUser.name,
+                "isAdmin" to false
+            ),
+            regularUser.login
+        )
 
         unconfirmedUser = userRepository.save(
             User(
@@ -191,6 +209,7 @@ class UserServiceTest {
         }
     }
 
+
     @Test
     fun `registerAdmin должен выбрасывать UserIsAlreadyExistsException, когда пользователь уже существует`() {
         val request = RegisterAdminRequest(
@@ -218,7 +237,6 @@ class UserServiceTest {
             userService.registerAdmin(request)
         }.message shouldBe "Invalid secret"
     }
-
 
     @Test
     fun `registrUser должен корректо сохранять нового пользователя ` () {
@@ -251,7 +269,6 @@ class UserServiceTest {
         }
     }
 
-
     @Test
     fun `registrUser должен выбрасывать User is already exists, если пользователь уже существует` () {
         val request = RegisterAdminRequest(
@@ -266,33 +283,6 @@ class UserServiceTest {
         }.message shouldBe "User is already exists"
     }
 
-
-    /*
-    @Test
-    fun `getNotRegistered должен возвращать только неподтвержденных пользователей`() {
-        // Создаем неподтвержденных пользователей
-        val unconfirmedUsers = listOf(
-            User(
-                login = "unconfirmed1@test.com",
-                password = "pass1",
-                uuid = UUID.randomUUID(),
-                isConfirmed = false
-            ),
-            User(
-                login = "unconfirmed2@test.com",
-                password = "pass2",
-                uuid = UUID.randomUUID(),
-                isConfirmed = false
-            )
-        ).map { userRepository.save(it) }
-
-        val response = userService.getNotRegistered(adminUser.token!!)
-
-        response.users shouldHaveSize  2
-        response.users.map { it.login } shouldContainAll unconfirmedUsers.map { it.login }
-    }
-    */
-
     @Test
     fun `getNotRegistered должен выбрасывать исключение при невалидном токене`() {
         shouldThrow<UserNotFoundException> {
@@ -300,31 +290,12 @@ class UserServiceTest {
         }.message shouldBe "token is invalid"
     }
 
-
     @Test
     fun `getNotRegistered должен проверять права администратора`() {
         shouldThrow<UserIsNotAdminException> {
-            userService.getNotRegistered(regularUser.token!!)
+            userService.getNotRegistered(regularUserToken)
         }.message shouldBe "User is not admin"
     }
-
-    /*
-    @Test
-    fun `getNotRegistered должен игнорировать пользователей с null токеном`() {
-        userRepository.save(
-            User(
-                login = "no_token@test.com",
-                password = "pass",
-                uuid = UUID.randomUUID(),
-                isConfirmed = false,
-                token = null
-            )
-        )
-
-        val response = userService.getNotRegistered(adminUser.token!!)
-        response.users shouldHaveSize 1
-    }
-     */
 
     @Test
     fun `acceptUser должен подтверждать пользователя при isConfirmed = true`() {
@@ -333,14 +304,11 @@ class UserServiceTest {
             isConfirmed = true
         )
 
-        val response = userService.acceptUser(request, adminUser.token!!)
+        val response = userService.acceptUser(request, adminToken)
 
         response shouldBe StatusResponse("ok")
-
-        val updatedUser = userRepository.findByLogin(unconfirmedUser.login)
-        updatedUser!!.isConfirmed shouldBe true
+        userRepository.findByLogin(unconfirmedUser.login)!!.isConfirmed shouldBe true
     }
-
 
     @Test
     fun `acceptUser должен удалять пользователя при isConfirmed = false`() {
@@ -349,13 +317,11 @@ class UserServiceTest {
             isConfirmed = false
         )
 
-        val response = userService.acceptUser(request, adminUser.token!!)
+        val response = userService.acceptUser(request, adminToken)
 
         response shouldBe StatusResponse("ok")
-
         userRepository.findByLogin(unconfirmedUser.login) shouldBe null
     }
-
 
     @Test
     fun `acceptUser должен выбрасывать исключение при невалидном токене админа`() {
@@ -366,37 +332,42 @@ class UserServiceTest {
         }.message shouldBe "token is invalid"
     }
 
-
     @Test
     fun `acceptUser должен проверять права администратора`() {
         val request = AcceptUserRequest(unconfirmedUser.login, true)
 
         shouldThrow<UserIsNotAdminException> {
-            userService.acceptUser(request, regularUser.token!!)
+            userService.acceptUser(request, regularUserToken)
         }.message shouldBe "User is not admin"
     }
-
 
     @Test
     fun `acceptUser должен выбрасывать исключение если пользователь не найден`() {
         val request = AcceptUserRequest("non_existing@test.com", true)
 
         shouldThrow<UserNotFoundException> {
-            userService.acceptUser(request, adminUser.token!!)
+            userService.acceptUser(request, adminToken)
         }.message shouldBe "User is not found"
     }
 
-
     @Test
     fun `acceptUser должен корректно обрабатывать уже подтвержденного пользователя`() {
-        unconfirmedUser.isConfirmed = true
-        userRepository.save(unconfirmedUser)
+        val confirmedUser = userRepository.save(
+            User(
+                login = "already_confirmed@test.com",
+                password = "password",
+                uuid = UUID.randomUUID(),
+                isConfirmed = true
+            )
+        )
 
-        val request = AcceptUserRequest(unconfirmedUser.login, true)
+        val request = AcceptUserRequest(confirmedUser.login, true)
 
-        val response = userService.acceptUser(request, adminUser.token!!)
+        val response = userService.acceptUser(request, adminToken)
 
-        userRepository.findByLogin(unconfirmedUser.login)!!.isConfirmed shouldBe true
+        userRepository.findByLogin(confirmedUser.login)!!.apply {
+            isConfirmed shouldBe true
+        }
         response shouldBe StatusResponse("ok")
     }
 }
