@@ -58,7 +58,7 @@ const SendFile = () => {
     setUploadError(null);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/printer/print', {
+      const response = await fetch('http://45.43.89.85:8080/api/v1/printer/print', {
         method: 'POST',
         body: formData,
         headers: {
@@ -77,8 +77,13 @@ const SendFile = () => {
       }
 
       const result = await response.json();
-      console.log('Успешная загрузка:', result);
-      setUploadSuccess(true);
+      console.log('Успешная печать:', result.message);
+      if (result.message === "Файл напечатан") {
+        setUploadSuccess(true);
+      } else {
+        setUploadSuccess(false);
+        setUploadError(result.message || "Ошибка печати")
+      }
     } catch (error) {
       console.error('Ошибка при загрузке файла:', error);
       setUploadError(error.message || 'Произошла ошибка при загрузке файла');
@@ -215,7 +220,7 @@ const SendFile = () => {
               textAlign: 'center'
             }}
           >
-            Файл успешно загружен!
+            Файл успешно напечатан!
           </Typography>
         )}
       </Paper>

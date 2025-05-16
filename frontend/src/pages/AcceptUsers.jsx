@@ -26,7 +26,7 @@ const AcceptUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/user/get_users', {
+      const response = await fetch('http://45.43.89.85:8080/api/v1/user/get_users', {
         headers: {
           'Authorization': `${sessionStorage.getItem("token")}`
         }
@@ -54,7 +54,7 @@ const AcceptUsers = () => {
     setSuccess(null);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/user/accept_user', {
+      const response = await fetch('http://45.43.89.85:8080/api/v1/user/accept_user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
