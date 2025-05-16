@@ -34,11 +34,11 @@ class UnitPrintServiceTest {
 
         every { jwtService.validateToken(token) } returns false
 
-        val exception = assertThrows(UserNotFoundException::class.java) {
+        val exception = assertThrows(UnauthorizedException::class.java) {
             printService.getPrinted(token)
         }
 
-        exception.message shouldBe "token is invalid"
+        exception.message shouldBe "Authorization error"
     }
 
     @Test
@@ -54,11 +54,11 @@ class UnitPrintServiceTest {
         every { jwtService.getLoginFromToken(token) } returns testUser.login
         every { userRepository.findByLogin(testUser.login) } returns null
 
-        val exception = assertThrows(UnauthorizedException::class.java) {
+        val exception = assertThrows(UserNotFoundException::class.java) {
             printService.getPrinted(token)
         }
 
-        exception.message shouldBe "Authorization error"
+        exception.message shouldBe "token is invalid"
     }
 
     @Test
@@ -91,11 +91,11 @@ class UnitPrintServiceTest {
 
         every { jwtService.validateToken(token) } returns false
 
-        val exception = assertThrows(UserNotFoundException::class.java) {
+        val exception = assertThrows(UnauthorizedException::class.java) {
             printService.getNotPrinted(token)
         }
 
-        exception.message shouldBe "token is invalid"
+        exception.message shouldBe "Authorization error"
     }
 
     @Test
@@ -111,11 +111,11 @@ class UnitPrintServiceTest {
         every { jwtService.getLoginFromToken(token) } returns testUser.login
         every { userRepository.findByLogin(testUser.login) } returns null
 
-        val exception = assertThrows(UnauthorizedException::class.java) {
+        val exception = assertThrows(UserNotFoundException::class.java) {
             printService.getNotPrinted(token)
         }
 
-        exception.message shouldBe "Authorization error"
+        exception.message shouldBe "token is invalid"
     }
 
     @Test

@@ -113,7 +113,7 @@ class PrintService (
 
     fun getNotPrinted(token: String): FilesResponse {
         if (!jwtService.validateToken(token)) {
-            throw UserNotFoundException("token is invalid")
+            throw UnauthorizedException("Authorization error")
         }
 
         val login = jwtService.getLoginFromToken(token)
@@ -121,7 +121,7 @@ class PrintService (
 
 
         if (user == null) {
-            throw UnauthorizedException("Authorization error")
+            throw UserNotFoundException("token is invalid")
         }
 
         val files = fileRepository.findByUserAndIsPrinted(user, false).map { it.filePath }
@@ -131,7 +131,7 @@ class PrintService (
 
     fun getPrinted(token: String): FilesResponse {
         if (!jwtService.validateToken(token)) {
-            throw UserNotFoundException("token is invalid")
+            throw UnauthorizedException("Authorization error")
         }
 
         val login = jwtService.getLoginFromToken(token)
@@ -139,7 +139,7 @@ class PrintService (
 
 
         if (user == null) {
-            throw UnauthorizedException("Authorization error")
+            throw UserNotFoundException("token is invalid")
         }
 
         val files = fileRepository.findByUserAndIsPrinted(user, true).map { it.filePath }
