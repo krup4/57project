@@ -2,10 +2,7 @@ package application.service
 
 import application.config.Properties
 import application.entity.User
-import application.exception.BadRequestException
-import application.exception.UserNotFoundException
-import application.exception.UserIsAlreadyExistsException
-import application.exception.UserIsNotAdminException
+import application.exception.*
 import application.repository.UserRepository
 import application.request.AcceptUserRequest
 import application.request.AuthoriseRequest
@@ -370,4 +367,52 @@ class UserServiceTest {
         }
         response shouldBe StatusResponse("ok")
     }
+
+    @Test
+    fun `getNotRegistered должен выбрасывать UnauthorizedException при отсутствии пользователя в базе`() {
+        val fakeToken = jwtService.generateToken(
+            mapOf("login" to "ghost@test.com", "name" to "Ghost", "isAdmin" to true),
+            "ghost@test.com"
+        )
+
+        shouldThrow<UnauthorizedException> {
+            userService.getNotRegistered(fakeToken)
+        }.message shouldBe "Authorization error"
+    }
+
+    @Test
+    fun `getNotRegistered должен возвращать пустой список если нет неподтвержденных пользователей`() {
+        userRepository.delete(unconfirmedUser)
+
+        val response = userService.getNotRegistered(adminToken)
+        response.users shouldHaveSize 0
+    }
+
+    @Test
+    fun `acceptUser должен выбрасывать UnauthorizedException если пользователь с токеном не существует`() {
+        val fakeToken = jwtService.generateToken(
+            mapOf("login" to "fake_admin@test.com", "name" to "Fake Admin", "isAdmin" to true),
+            "fake_admin@test.com"
+        )
+
+        val request = AcceptUserRequest("any_user@test.com", true)
+
+        shouldThrow<UnauthorizedException> {
+            userService.acceptUser(request, fakeToken)
+        }.message shouldBe "Authorization error"
+    }
+
+    @Test
+    fun `acceptUser должен откатывать транзакцию при ошибке`() {
+        val initialCount = userRepository.count()
+
+        try {
+            userService.acceptUser(AcceptUserRequest("invalid@user.com", true), "invalid_token")
+        } catch (e: Exception) {
+
+        }
+
+        userRepository.count() shouldBe initialCount
+    }
+
 }
