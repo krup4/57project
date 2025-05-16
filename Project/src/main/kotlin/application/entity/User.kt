@@ -12,7 +12,7 @@ import java.util.*
         Index(name = "idx_users_token", columnList = "token")
     ]
 )
-class User (
+data class User (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
