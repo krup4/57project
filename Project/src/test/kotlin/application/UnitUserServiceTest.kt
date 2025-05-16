@@ -253,8 +253,7 @@ class UnitUserServiceTest {
         every { userRepository.findByLogin(request.login) } returns null
         every { passwordEncoder.encode(request.password) } returns encodedPassword
         every { userRepository.save(any()) } answers {
-            val user = firstArg<User>()
-            every { user.uuid } returns expectedUuid
+            val user = firstArg<User>().copy(uuid = expectedUuid) // Используем copy вместо every
             user
         }
 
@@ -289,9 +288,11 @@ class UnitUserServiceTest {
             name = "Test User"
         )
 
+        val mockUser = mockk<User>(relaxed = true) // Используем relaxed mock
+
         every { userRepository.findByLogin(request.login) } returns null
         every { passwordEncoder.encode(request.password) } returns "encoded_password"
-        every { userRepository.save(any()) } returns mockk()
+        every { userRepository.save(any()) } returns mockUser // Возвращаем мок пользователя
 
         userService.registerUser(request)
 
@@ -422,7 +423,6 @@ class UnitUserServiceTest {
         val result = userService.getNotRegistered(validToken)
 
         result.users shouldBe notRegisteredUsers
-        //verify(exactly = 1) { logger.info("Получен список неподтвержденных пользователей") }
         verify(exactly = 1) { jwtService.validateToken(validToken) }
         verify(exactly = 1) { jwtService.getLoginFromToken(validToken) }
         verify(exactly = 1) { userRepository.findByLogin(login) }
@@ -450,7 +450,6 @@ class UnitUserServiceTest {
         val result = userService.getNotRegistered(validToken)
 
         result.users shouldBe emptyList()
-        //verify(exactly = 1) { logger.info("Получен список неподтвержденных пользователей") }
     }
 
     @Test
@@ -587,7 +586,6 @@ class UnitUserServiceTest {
                 user.login == userLogin && user.isConfirmed == true
             })
         }
-        //verify(exactly = 1) { logger.info("Регистрация пользователя ${userToAccept.uuid} подтверждена") }
     }
 
     @Test
@@ -624,6 +622,5 @@ class UnitUserServiceTest {
         result shouldBe StatusResponse("ok")
         verify(exactly = 1) { userRepository.delete(userToReject) }
         verify(exactly = 0) { userRepository.save(any()) }
-        //verify(exactly = 1) { logger.info("Регистрация пользователя ${userToReject.uuid} не подтверждена") }
     }
 }
